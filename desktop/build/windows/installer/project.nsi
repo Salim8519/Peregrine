@@ -1,8 +1,8 @@
 Unicode true
 
-# Peregrine: LZMA, solid, with a dictionary big enough to span ffmpeg.exe so ffprobe.exe
-# (almost the same binary) compresses nearly for free. About half the size of the default
-# zlib installer (ADR 0015). Unpacking needs ~128 MB of RAM for a few seconds.
+# Peregrine: LZMA, solid, with a dictionary big enough to span the largest bundled binary
+# (ffmpeg.exe, ~100 MB). About half the size of the default zlib installer (ADR 0015).
+# Unpacking needs ~128 MB of RAM for a few seconds.
 SetCompressor /SOLID lzma
 SetCompressorDictSize 128
 
@@ -150,7 +150,10 @@ Section
     # the release workflow. /nonfatal keeps local installer builds without them working.
     File /nonfatal "..\..\bin\yt-dlp.exe"
     File /nonfatal "..\..\bin\ffmpeg.exe"
-    File /nonfatal "..\..\bin\ffprobe.exe"
+    # Deno: the JavaScript runtime yt-dlp needs for YouTube (ADR 0022).
+    File /nonfatal "..\..\bin\deno.exe"
+    # ffprobe is no longer shipped (ADR 0022); remove the copy an older version installed.
+    Delete "$INSTDIR\ffprobe.exe"
     File /nonfatal "..\..\bin\ffmpeg-LICENSE.txt"
     File /nonfatal "..\..\bin\THIRD-PARTY-NOTICES.txt"
 

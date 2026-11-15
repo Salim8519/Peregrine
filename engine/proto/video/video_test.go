@@ -263,7 +263,11 @@ func TestFindsBundledToolsNextToExecutable(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		name, ff = name+".exe", ff+".exe"
 	}
-	for _, n := range []string{name, ff} {
+	deno := "deno"
+	if runtime.GOOS == "windows" {
+		deno += ".exe"
+	}
+	for _, n := range []string{name, ff, deno} {
 		if err := os.WriteFile(filepath.Join(dir, n), []byte("x"), 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -273,6 +277,39 @@ func TestFindsBundledToolsNextToExecutable(t *testing.T) {
 	y, f, err := p.tools()
 	if err != nil || y != filepath.Join(dir, name) || f != filepath.Join(dir, ff) {
 		t.Fatalf("tools() = %q %q %v", y, f, err)
+	}
+	if d, err := p.find("", "deno"); err != nil || d != filepath.Join(dir, deno) {
+		t.Fatalf("find(deno) = %q %v", d, err)
+	}
+}
+
+// A bundled Deno is named to yt-dlp (it needs it for YouTube's player challenges); without
+// one, no --js-runtimes is passed and the download still runs.
+func TestDenoPassedToYtDlp(t *testing.T) {
+	deno := filepath.Join(t.TempDir(), "deno")
+	if err := os.WriteFile(deno, []byte("x"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	p, log := testProto(t)
+	p.opts.DenoPath = deno
+	fj := newFakeJob(t)
+	if err := p.run(context.Background(), fj.job("https://www.youtube.com/watch?v=x&size=20000", nil, true)); err != nil {
+		t.Fatal(err)
+	}
+	for i, c := range readCalls(t, log) {
+		if !hasPair(c.Args, "--js-runtimes", "deno:"+deno) {
+			t.Fatalf("call %d lacks --js-runtimes deno:<path>: %q", i, c.Args)
+		}
+	}
+
+	p.opts.DenoPath = filepath.Join(t.TempDir(), "missing")
+	err := p.run(context.Background(), newFakeJob(t).job("https://www.youtube.com/watch?v=y&size=20000", nil, true))
+	if err == nil || !strings.Contains(err.Error(), "deno not found") {
+		t.Fatalf("explicit missing Deno: %v", err)
+	}
+
+	if slices.Contains((args{}).common(), "--js-runtimes") {
+		t.Fatal("--js-runtimes passed without a Deno")
 	}
 }
 

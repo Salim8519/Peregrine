@@ -29,6 +29,7 @@ var withValue = map[string]bool{
 	"-o": true, "--print": true, "--progress-template": true, "-f": true,
 	"--merge-output-format": true, "--ffmpeg-location": true, "--limit-rate": true,
 	"--cookies": true, "--referer": true, "--user-agent": true, "--encoding": true,
+	"--js-runtimes": true,
 }
 
 type logEntry struct {

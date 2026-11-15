@@ -31,6 +31,9 @@ const Kind = "video"
 type Options struct {
 	YtDlpPath  string
 	FFmpegPath string
+	// DenoPath is the JavaScript runtime yt-dlp needs to solve YouTube's player challenges
+	// (ADR 0022). Optional: without it YouTube finds no formats, other sites still work.
+	DenoPath string
 	// Playlist downloads a whole playlist when the URL names one; by default only the
 	// video is fetched (--no-playlist). A playlist still ends up as a single file today.
 	Playlist bool
@@ -93,12 +96,17 @@ func (p *Protocol) run(ctx context.Context, j *job) error {
 	if err != nil {
 		return err
 	}
+	deno, err := p.find(p.opts.DenoPath, "deno")
+	if err != nil {
+		return err
+	}
 	var st state
 	if len(j.state) > 0 {
 		_ = json.Unmarshal(j.state, &st)
 	}
 	j.api.SetResumable(true)
 	a := p.argsFor(j, ffmpeg)
+	a.deno = deno
 
 	if j.fresh && !st.Named {
 		name, err := p.probe(ctx, ytdlp, a, j)
@@ -170,6 +178,7 @@ func cookieFor(dir string, j *job) (string, error) {
 // args holds the yt-dlp options shared by the probe and the download.
 type args struct {
 	ffmpeg     string
+	deno       string
 	restrict   bool
 	noPlaylist bool
 	limit      int64
@@ -205,6 +214,11 @@ func (a args) common() []string {
 		out = append(out, "-f", "bv*+ba/b", "--merge-output-format", "mp4/mkv", "--ffmpeg-location", a.ffmpeg)
 	} else {
 		out = append(out, "-f", "b") // merging needs ffmpeg: take the best single file
+	}
+	if a.deno != "" {
+		// Name the bundled runtime: yt-dlp only searches PATH (and, on Windows, its own
+		// folder), and the macOS app folder is on neither.
+		out = append(out, "--js-runtimes", "deno:"+a.deno)
 	}
 	if a.restrict {
 		out = append(out, "--restrict-filenames")

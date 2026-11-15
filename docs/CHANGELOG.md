@@ -4,6 +4,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.3] - 2026-11-15
+
+### Fixed
+- YouTube downloads failed with "Requested format is not available". YouTube now needs a
+  JavaScript runtime to unlock its videos, so Peregrine ships Deno next to yt-dlp
+  (pinned and checksum-verified like yt-dlp and ffmpeg). If YouTube asks to confirm you are not a bot, add the video from the browser
+  extension, which passes your YouTube sign-in.
+
+### Changed
+- ffprobe is no longer bundled (yt-dlp uses ffmpeg instead), which saves about 100 MB on
+  disk and pays for most of Deno. Updating removes the old copy. The installer is about
+  25–30 MB bigger than 0.5.2.
+
 ### Added
 - Windows: when Peregrine goes to the tray (closing the window, or finishing the quick-add
   popup), the window slides toward its tray icon and fades out in about a quarter of a

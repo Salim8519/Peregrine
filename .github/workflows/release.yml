@@ -30,9 +30,14 @@ env:
   FFMPEG_MAC_AMD64: "amd64/1789931006_9.0.2"
   FFMPEG_MAC_ARM64: "arm64/1789931890_9.0.2"
   FFMPEG_MAC_AMD64_SHA256: "7c6b4125b191cbf773832dc51f424cf2b6bb7da43007d1e066f95909e47cacd4"
-  FFPROBE_MAC_AMD64_SHA256: "2322438ed2f6319a691291b247d09c69dcaa3a982460d1f269a7e1af335cfdfd"
   FFMPEG_MAC_ARM64_SHA256: "c8ed4c4e6978a03c485edbfe4e0a5dc2380f8a30bba5150531b31b094492d924"
-  FFPROBE_MAC_ARM64_SHA256: "fcbe839537485eaee7a7a8bc5cbc0f90d53617e80943e8a5b2e31cb851197ea6"
+  # No ffprobe: our code never calls it and yt-dlp falls back to ffmpeg (ADR 0022).
+  # Deno: the JavaScript runtime yt-dlp needs for YouTube (ADR 0022). Official release zips;
+  # sums from the .sha256sum file published next to each zip.
+  DENO_VERSION: "2.9.8"
+  DENO_WIN_SHA256: "cba84b26e0df5ae7f74fc66b86a95b866872a86292ebd84fa1e959927edd93bf"        # deno-x86_64-pc-windows-msvc.zip
+  DENO_MAC_AMD64_SHA256: "4b2f5edd2639b7470f034238b321d7002d8dfb4726d8558f52c17afac370eb2c"  # deno-x86_64-apple-darwin.zip
+  DENO_MAC_ARM64_SHA256: "9f0bf660393da2eaff044cdc7444cb08c73f235849b61d224d825a194ce7c98e"  # deno-aarch64-apple-darwin.zip
 
 jobs:
   test:
@@ -91,7 +96,7 @@ jobs:
         run: |
           choco install nsis -y --no-progress
           Add-Content -Path $env:GITHUB_PATH -Value "${env:ProgramFiles(x86)}\NSIS"
-      - name: Fetch yt-dlp + ffmpeg (pinned, SHA-256 verified)
+      - name: Fetch yt-dlp + ffmpeg + Deno (pinned, SHA-256 verified)
         shell: bash
         run: |
           set -euo pipefail
@@ -104,10 +109,14 @@ jobs:
           fetch "https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/yt-dlp.exe" tools-dl/yt-dlp.exe "$YTDLP_WIN_SHA256"
           fetch "$FFMPEG_WIN_URL" tools-dl/ffmpeg.zip "$FFMPEG_WIN_SHA256"
           (cd tools-dl && 7z x -y ffmpeg.zip >/dev/null)
+          fetch "https://github.com/denoland/deno/releases/download/v${DENO_VERSION}/deno-x86_64-pc-windows-msvc.zip" tools-dl/deno.zip "$DENO_WIN_SHA256"
+          (cd tools-dl && 7z x -y deno.zip deno.exe >/dev/null)
+          tools-dl/deno.exe --version | head -1 | tr -d '\r' | grep -qx "deno ${DENO_VERSION} .*" || { echo "::error::Deno version mismatch"; exit 1; }
+          cp tools-dl/deno.exe desktop/build/bin/
           ff=$(dirname "$(find tools-dl -path '*/bin/ffmpeg.exe' | head -1)")
           [ "$(tools-dl/yt-dlp.exe --version | tr -d '\r')" = "$YTDLP_VERSION" ] || { echo "::error::yt-dlp version mismatch"; exit 1; }
           "$ff/ffmpeg.exe" -L | grep -qE "GNU (Lesser )?General Public License" || { echo "::error::ffmpeg is not an LGPL/GPL build"; exit 1; }
-          cp tools-dl/yt-dlp.exe "$ff/ffmpeg.exe" "$ff/ffprobe.exe" desktop/build/bin/
+          cp tools-dl/yt-dlp.exe "$ff/ffmpeg.exe" desktop/build/bin/
           cp "$ff/../LICENSE" desktop/build/bin/ffmpeg-LICENSE.txt 2>/dev/null || "$ff/ffmpeg.exe" -L > desktop/build/bin/ffmpeg-LICENSE.txt
           cat > desktop/build/bin/THIRD-PARTY-NOTICES.txt <<EOF
           Peregrine bundles these separate programs, which it runs for video-site downloads:
@@ -115,9 +124,13 @@ jobs:
           yt-dlp ${YTDLP_VERSION} - The Unlicense (public domain)
             https://github.com/yt-dlp/yt-dlp  (source: the ${YTDLP_VERSION} tag)
 
-          FFmpeg (ffmpeg.exe, ffprobe.exe) - GNU GPL, see ffmpeg-LICENSE.txt
+          FFmpeg (ffmpeg.exe) - GNU GPL, see ffmpeg-LICENSE.txt
             Build: ${FFMPEG_WIN_URL}
             Source: https://ffmpeg.org/download.html and https://www.gyan.dev/ffmpeg/builds/
+
+          Deno ${DENO_VERSION} (deno.exe) - MIT License, Copyright 2018-2026 the Deno authors
+            https://github.com/denoland/deno  (source: the v${DENO_VERSION} tag)
+            Full text: https://github.com/denoland/deno/blob/v${DENO_VERSION}/LICENSE.md
           EOF
           { echo; echo "The user interface embeds the Noto Naskh Arabic font (Arabic subset),"; echo "SIL Open Font License 1.1:"; echo; cat desktop/frontend/src/fonts/OFL-NotoNaskhArabic.txt; } >> desktop/build/bin/THIRD-PARTY-NOTICES.txt
           ls -la desktop/build/bin
@@ -148,8 +161,9 @@ jobs:
           if [ -z "$installer" ]; then echo "::error::NSIS installer was not built"; exit 1; fi
           cp "$installer" "out/Peregrine-${V}-windows-x64-setup.exe"
           cp desktop/build/bin/Peregrine.exe desktop/build/bin/peregrine-host.exe LICENSE portable/Peregrine/
-          cp desktop/build/bin/yt-dlp.exe desktop/build/bin/ffmpeg.exe desktop/build/bin/ffprobe.exe \
+          cp desktop/build/bin/yt-dlp.exe desktop/build/bin/ffmpeg.exe \
              desktop/build/bin/ffmpeg-LICENSE.txt desktop/build/bin/THIRD-PARTY-NOTICES.txt portable/Peregrine/
+          cp desktop/build/bin/deno.exe portable/Peregrine/
           cp -r desktop/build/bin/extension portable/Peregrine/extension
           (cd portable && 7z a -tzip "../out/Peregrine-${V}-windows-x64-portable.zip" Peregrine >/dev/null)
       - uses: actions/upload-artifact@v4
@@ -186,7 +200,7 @@ jobs:
           lipo -create -output "$APP/Contents/MacOS/peregrine-host" /tmp/peregrine-host-amd64 /tmp/peregrine-host-arm64
           bash scripts/stage-extension.sh "$APP/Contents/Resources/extension"
 
-          # yt-dlp + ffmpeg/ffprobe for video sites (ADR 0013), next to the app binary.
+          # yt-dlp + ffmpeg (ADR 0013) and Deno (ADR 0022) for video sites, next to the app binary.
           set -euo pipefail
           fetch() { # url file sha256
             [ "${#3}" -eq 64 ] || { echo "::error::no SHA-256 pinned for $1"; exit 1; }
@@ -196,17 +210,24 @@ jobs:
           T=$(mktemp -d)
           fetch "https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/yt-dlp_macos" "$T/yt-dlp" "$YTDLP_MAC_SHA256"
           fetch "$FFMPEG_MAC_BASE/$FFMPEG_MAC_AMD64/ffmpeg.zip"  "$T/ffmpeg-amd64.zip"  "$FFMPEG_MAC_AMD64_SHA256"
-          fetch "$FFMPEG_MAC_BASE/$FFMPEG_MAC_AMD64/ffprobe.zip" "$T/ffprobe-amd64.zip" "$FFPROBE_MAC_AMD64_SHA256"
           fetch "$FFMPEG_MAC_BASE/$FFMPEG_MAC_ARM64/ffmpeg.zip"  "$T/ffmpeg-arm64.zip"  "$FFMPEG_MAC_ARM64_SHA256"
-          fetch "$FFMPEG_MAC_BASE/$FFMPEG_MAC_ARM64/ffprobe.zip" "$T/ffprobe-arm64.zip" "$FFPROBE_MAC_ARM64_SHA256"
-          for tool in ffmpeg ffprobe; do
+          DENO_BASE="https://github.com/denoland/deno/releases/download/v${DENO_VERSION}"
+          fetch "$DENO_BASE/deno-x86_64-apple-darwin.zip"  "$T/deno-amd64.zip" "$DENO_MAC_AMD64_SHA256"
+          fetch "$DENO_BASE/deno-aarch64-apple-darwin.zip" "$T/deno-arm64.zip" "$DENO_MAC_ARM64_SHA256"
+          for arch in amd64 arm64; do
+            mkdir -p "$T/deno-$arch" && unzip -o -q "$T/deno-$arch.zip" -d "$T/deno-$arch"
+          done
+          lipo -create -output "$APP/Contents/MacOS/deno" "$T/deno-amd64/deno" "$T/deno-arm64/deno"
+          chmod 0755 "$APP/Contents/MacOS/deno"
+          "$APP/Contents/MacOS/deno" --version | head -1 | grep -qx "deno ${DENO_VERSION} .*" || { echo "::error::Deno version mismatch"; exit 1; }
+          for tool in ffmpeg; do
             for arch in amd64 arm64; do
               mkdir -p "$T/$arch" && unzip -o -q "$T/$tool-$arch.zip" -d "$T/$arch"
             done
             lipo -create -output "$APP/Contents/MacOS/$tool" "$T/amd64/$tool" "$T/arm64/$tool"
           done
           install -m 0755 "$T/yt-dlp" "$APP/Contents/MacOS/yt-dlp"
-          chmod 0755 "$APP/Contents/MacOS/ffmpeg" "$APP/Contents/MacOS/ffprobe"
+          chmod 0755 "$APP/Contents/MacOS/ffmpeg"
           [ "$("$APP/Contents/MacOS/yt-dlp" --version)" = "$YTDLP_VERSION" ] || { echo "::error::yt-dlp version mismatch"; exit 1; }
           "$APP/Contents/MacOS/ffmpeg" -L | grep -qE "GNU (Lesser )?General Public License" || { echo "::error::ffmpeg is not an LGPL/GPL build"; exit 1; }
           "$APP/Contents/MacOS/ffmpeg" -L > "$APP/Contents/Resources/ffmpeg-LICENSE.txt"
@@ -216,9 +237,13 @@ jobs:
           yt-dlp ${YTDLP_VERSION} - The Unlicense (public domain)
             https://github.com/yt-dlp/yt-dlp  (source: the ${YTDLP_VERSION} tag)
 
-          FFmpeg (ffmpeg, ffprobe) - GNU GPL, see ffmpeg-LICENSE.txt
+          FFmpeg (ffmpeg) - GNU GPL, see ffmpeg-LICENSE.txt
             Builds: ${FFMPEG_MAC_BASE}/${FFMPEG_MAC_AMD64}/ and ${FFMPEG_MAC_BASE}/${FFMPEG_MAC_ARM64}/
             Source: https://ffmpeg.org/download.html and https://ffmpeg.martin-riedl.de/
+
+          Deno ${DENO_VERSION} (deno) - MIT License, Copyright 2018-2026 the Deno authors
+            https://github.com/denoland/deno  (source: the v${DENO_VERSION} tag)
+            Full text: https://github.com/denoland/deno/blob/v${DENO_VERSION}/LICENSE.md
           EOF
           { echo; echo "The user interface embeds the Noto Naskh Arabic font (Arabic subset),"; echo "SIL Open Font License 1.1:"; echo; cat desktop/frontend/src/fonts/OFL-NotoNaskhArabic.txt; } >> "$APP/Contents/Resources/THIRD-PARTY-NOTICES.txt"
           rm -rf "$T"

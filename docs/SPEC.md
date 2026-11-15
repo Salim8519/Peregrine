@@ -129,8 +129,9 @@ All are plug-ins behind `engine.Protocol` (kind per download), registered by
 - **HLS/DASH** (`.m3u8`, `.mpd`): native segment downloader for unencrypted streams, live
   HLS recording, remuxed with ffmpeg; DRM is refused (ADR 0012).
 - **Video sites** (YouTube and other known hosts, or any page marked "This is a video
-  page"): bundled yt-dlp sidecar, with ffmpeg for merging. Both are pinned and checksum-
-  verified in the release build (ADR 0013).
+  page"): bundled yt-dlp sidecar, with ffmpeg for merging and Deno as the JavaScript
+  runtime yt-dlp needs for YouTube. All are pinned and checksum-verified in the release
+  build (ADR 0013, ADR 0022).
 - **BitTorrent** via `anacrolix/torrent`: magnet links, `.torrent` URLs and local
   `.torrent` files (double-click / file association, drag onto the window). Peregrine
   registers as the handler for `magnet:` and `.torrent`. No seeding after completion;
