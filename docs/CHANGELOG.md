@@ -4,6 +4,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.2] - 2026-11-15
+
 ### Fixed
 - Windows: a download from the browser opened the whole app when Peregrine was already open
   behind the browser. It now opens the small quick-add window there too, and afterwards
