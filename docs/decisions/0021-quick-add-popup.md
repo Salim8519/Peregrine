@@ -24,6 +24,13 @@ When the download finished, the notification could only open the app, not the fi
   as it was and hide it again (tray) or minimise it again. A tray click or anything else that
   opens the app grows the popup into the full app with the dialog still open. When the window
   is already on screen, the dialog opens inside the app as before.
+- **Open behind the browser (Windows, added after 0.5.1).** The popup is also used when the
+  window is open but not focused (the UI reports focus; the user is in the browser). Closing
+  it restores the window's shape and shows it again below the other windows without
+  activating it (`ShowWindow(SW_SHOWNOACTIVATE)` + `SetWindowPos(HWND_BOTTOM)`), then hands
+  the focus back to the window that was in front when the link arrived. macOS keeps the old
+  behaviour (dialog inside the app) until it can be done and tested there. When the user is
+  in the app, the dialog opens inside it.
 - A link handed over by a second launch or the OS (`Peregrine.exe <url>`, magnet links,
   `.torrent` files) no longer opens the full window first; the capture decides.
 - The desktop keeps the link the popup is for, so a UI that loads after the capture event

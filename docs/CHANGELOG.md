@@ -4,6 +4,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+### Fixed
+- Windows: a download from the browser opened the whole app when Peregrine was already open
+  behind the browser. It now opens the small quick-add window there too, and afterwards
+  Peregrine goes back behind the browser, which keeps the focus. When you are working in
+  Peregrine itself, the dialog still opens inside it.
+
 ## [0.5.1] - 2026-11-15
 
 ### Added

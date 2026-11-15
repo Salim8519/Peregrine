@@ -86,7 +86,8 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
 - Main list: name, size, progress, speed (live), time left (steady countdown, "Waiting…" when no data arrives; ADR 0019), status, date added (local "YYYY-MM-DD HH:mm"; hover shows added and finished in full; hidden under 960 px wide); filter by category/status; search.
 - Add dialog: URL(s), folder, filename, connections, checksum, start now / add to queue.
   An offered link (extension, clipboard, OS) opens the short form: name, size, folder, with
-  "More details" for the rest. While the app is in the tray or minimised it opens as a
+  "More details" for the rest. While the app is in the tray, minimised, or (Windows) open behind
+  another window, it opens as a
   small popup window instead of the whole app (ADR 0021).
 - Batch add: paste many links; pattern links (`file[001-100].zip`).
 - Clipboard monitor (opt-in): a copied downloadable link opens the add dialog. This is the

@@ -9,7 +9,8 @@ import (
 )
 
 // Quick-add popup (ADR 0021): a link captured from the browser while the window is hidden
-// in the tray (or minimised) shows only a small add dialog, not the whole app. Wails v2 has
+// in the tray, minimised, or (Windows) open behind the browser shows only a small add
+// dialog, not the whole app. Wails v2 has
 // one window, so the popup is that window shrunk, centred and kept on top; finishing the
 // dialog puts it back the way it was and hides it again.
 
@@ -38,6 +39,12 @@ type window interface {
 	show()
 	hide()
 	setOnTop(on bool)
+	// showBehind shows the window again without taking the focus, below the other windows
+	// (the browser stays in front). Windows only; see canShowBehind.
+	showBehind(maximised bool)
+	// rememberFront records the window in front (the browser) so showBehind can give it
+	// the focus back.
+	rememberFront()
 	emitPopup(mode string) // "open", "closed" (back to the tray) or "expanded" (full app)
 }
 
@@ -45,7 +52,7 @@ type window interface {
 type popup struct {
 	mu     sync.Mutex
 	active bool
-	wasMin bool // the window was minimised (not in the tray) before the popup
+	from   popupFrom // where the window was before the popup
 	wasMax bool
 	prevW  int
 	prevH  int
@@ -56,21 +63,41 @@ type popup struct {
 	pending *api.Capture
 }
 
-// open turns the hidden or minimised window into the popup. It returns false (and does
-// nothing) when the window is already on screen: then the dialog opens inside the app.
-func (p *popup) open(w window, hidden bool) bool {
+// popupFrom is the window's state before the popup, where closing it puts it back.
+type popupFrom int
+
+const (
+	fromTray   popupFrom = iota // hidden in the tray / menu bar
+	fromMin                     // minimised to the taskbar / Dock
+	fromBehind                  // open, but the user was in another app (the browser)
+)
+
+// open turns the window into the popup when the user is not looking at the app: hidden in
+// the tray, minimised, or open but not focused (behind the browser; Windows only, where the
+// window can be put back behind without taking the focus). It returns false (and does
+// nothing) when the user is in the app: then the dialog opens inside it.
+func (p *popup) open(w window, hidden, focused bool) bool {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.active {
 		w.show() // another capture while the popup is up: just bring it forward
 		return true
 	}
-	minimised := !hidden && w.isMinimised()
-	if !hidden && !minimised {
+	from := fromTray
+	switch {
+	case hidden:
+	case w.isMinimised():
+		from = fromMin
+	case !focused && canShowBehind:
+		from = fromBehind
+	default:
 		return false
 	}
+	if from == fromBehind {
+		w.rememberFront()
+	}
 	p.active = true
-	p.wasMin = minimised
+	p.from = from
 	p.wasMax = w.isMaximised()
 	if p.wasMax {
 		w.unmaximise()
@@ -100,7 +127,7 @@ func (p *popup) close(w window, expand bool) bool {
 	w.setOnTop(false)
 	if !expand {
 		// Hide first, then restore the shape, so the user never sees the big window.
-		if p.wasMin {
+		if p.from == fromMin {
 			w.minimise()
 		} else {
 			w.hide()
@@ -109,7 +136,10 @@ func (p *popup) close(w window, expand bool) bool {
 	w.setMinSize(mainMinW, mainMinH)
 	w.setSize(p.prevW, p.prevH)
 	w.setPosition(p.prevX, p.prevY)
-	if p.wasMax {
+	switch {
+	case !expand && p.from == fromBehind:
+		w.showBehind(p.wasMax) // back where it was, behind the browser
+	case p.wasMax:
 		w.maximise()
 	}
 	if expand {
@@ -162,20 +192,22 @@ func (p *popup) isActive() bool {
 // wailsWindow is the real window.
 type wailsWindow struct{ ctx context.Context }
 
-func (w wailsWindow) isMinimised() bool       { return wruntime.WindowIsMinimised(w.ctx) }
-func (w wailsWindow) isMaximised() bool       { return wruntime.WindowIsMaximised(w.ctx) }
-func (w wailsWindow) size() (int, int)        { return wruntime.WindowGetSize(w.ctx) }
-func (w wailsWindow) position() (int, int)    { return wruntime.WindowGetPosition(w.ctx) }
-func (w wailsWindow) setSize(width, h int)    { wruntime.WindowSetSize(w.ctx, width, h) }
-func (w wailsWindow) setMinSize(width, h int) { wruntime.WindowSetMinSize(w.ctx, width, h) }
-func (w wailsWindow) setPosition(x, y int)    { wruntime.WindowSetPosition(w.ctx, x, y) }
-func (w wailsWindow) center()                 { wruntime.WindowCenter(w.ctx) }
-func (w wailsWindow) unmaximise()             { wruntime.WindowUnmaximise(w.ctx) }
-func (w wailsWindow) maximise()               { wruntime.WindowMaximise(w.ctx) }
-func (w wailsWindow) minimise()               { wruntime.WindowMinimise(w.ctx) }
-func (w wailsWindow) hide()                   { wruntime.WindowHide(w.ctx) }
-func (w wailsWindow) setOnTop(on bool)        { wruntime.WindowSetAlwaysOnTop(w.ctx, on) }
-func (w wailsWindow) emitPopup(mode string)   { wruntime.EventsEmit(w.ctx, "peregrine:popup", mode) }
+func (w wailsWindow) isMinimised() bool         { return wruntime.WindowIsMinimised(w.ctx) }
+func (w wailsWindow) isMaximised() bool         { return wruntime.WindowIsMaximised(w.ctx) }
+func (w wailsWindow) size() (int, int)          { return wruntime.WindowGetSize(w.ctx) }
+func (w wailsWindow) position() (int, int)      { return wruntime.WindowGetPosition(w.ctx) }
+func (w wailsWindow) setSize(width, h int)      { wruntime.WindowSetSize(w.ctx, width, h) }
+func (w wailsWindow) setMinSize(width, h int)   { wruntime.WindowSetMinSize(w.ctx, width, h) }
+func (w wailsWindow) setPosition(x, y int)      { wruntime.WindowSetPosition(w.ctx, x, y) }
+func (w wailsWindow) center()                   { wruntime.WindowCenter(w.ctx) }
+func (w wailsWindow) unmaximise()               { wruntime.WindowUnmaximise(w.ctx) }
+func (w wailsWindow) maximise()                 { wruntime.WindowMaximise(w.ctx) }
+func (w wailsWindow) minimise()                 { wruntime.WindowMinimise(w.ctx) }
+func (w wailsWindow) hide()                     { wruntime.WindowHide(w.ctx) }
+func (w wailsWindow) setOnTop(on bool)          { wruntime.WindowSetAlwaysOnTop(w.ctx, on) }
+func (w wailsWindow) showBehind(maximised bool) { showWindowBehind(maximised) }
+func (w wailsWindow) rememberFront()            { rememberFrontWindow() }
+func (w wailsWindow) emitPopup(mode string)     { wruntime.EventsEmit(w.ctx, "peregrine:popup", mode) }
 func (w wailsWindow) show() {
 	wruntime.WindowUnminimise(w.ctx)
 	wruntime.WindowShow(w.ctx)
@@ -183,16 +215,16 @@ func (w wailsWindow) show() {
 }
 
 // showForCapture is the API's ShowWindow hook: it runs when a captured link needs the add
-// dialog. A hidden or minimised window becomes the quick-add popup; a visible one comes
-// to the front as before.
+// dialog. A hidden, minimised or (Windows) unfocused window becomes the quick-add popup;
+// when the user is in the app, the dialog opens inside it.
 func (a *App) showForCapture() {
 	if a.ctx == nil {
 		return
 	}
 	a.life.mu.Lock()
-	hidden := a.life.hidden
+	hidden, focused := a.life.hidden, a.life.focused
 	a.life.mu.Unlock()
-	if !a.pop.open(wailsWindow{a.ctx}, hidden) {
+	if !a.pop.open(wailsWindow{a.ctx}, hidden, focused) {
 		a.showWindow()
 		return
 	}
@@ -213,7 +245,7 @@ func (a *App) PopupDone(expand bool) {
 	}
 	if !expand {
 		a.life.mu.Lock()
-		if !a.pop.wasMinimised() {
+		if a.pop.wasFrom() == fromTray {
 			a.life.setHiddenLocked(true)
 		}
 		a.life.mu.Unlock()
@@ -235,8 +267,9 @@ func (a *App) PopupActive() bool { return a.pop.isActive() }
 // after the capture event was sent.
 func (a *App) PopupPending() *api.Capture { return a.pop.pendingCapture() }
 
-func (p *popup) wasMinimised() bool {
+// wasFrom is where the last popup came from.
+func (p *popup) wasFrom() popupFrom {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	return p.wasMin
+	return p.from
 }

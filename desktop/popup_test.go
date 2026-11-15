@@ -19,6 +19,7 @@ type fakeWindow struct {
 	onTop    bool
 	events   []string
 	centered bool
+	behind   bool
 }
 
 func (f *fakeWindow) isMinimised() bool    { return f.min }
@@ -35,6 +36,10 @@ func (f *fakeWindow) minimise()            { f.min, f.visible = true, false }
 func (f *fakeWindow) show()                { f.min, f.visible = false, true }
 func (f *fakeWindow) hide()                { f.visible = false }
 func (f *fakeWindow) setOnTop(on bool)     { f.onTop = on }
+func (f *fakeWindow) rememberFront()       { f.events = append(f.events, "front") }
+func (f *fakeWindow) showBehind(max bool) {
+	f.visible, f.behind, f.max = true, true, max
+}
 func (f *fakeWindow) emitPopup(mode string) {
 	f.mu.Lock()
 	f.events = append(f.events, mode)
@@ -44,7 +49,7 @@ func (f *fakeWindow) emitPopup(mode string) {
 func TestPopupNotUsedWhenWindowVisible(t *testing.T) {
 	var p popup
 	w := &fakeWindow{visible: true, w: 1100, h: 700}
-	if p.open(w, false) {
+	if p.open(w, false, true) {
 		t.Fatal("popup opened over a visible window")
 	}
 	if w.w != 1100 || len(w.events) != 0 {
@@ -55,7 +60,7 @@ func TestPopupNotUsedWhenWindowVisible(t *testing.T) {
 func TestPopupFromTrayAndBack(t *testing.T) {
 	var p popup
 	w := &fakeWindow{w: 1100, h: 700, x: 40, y: 50}
-	if !p.open(w, true) {
+	if !p.open(w, true, true) {
 		t.Fatal("popup did not open from the tray")
 	}
 	if !w.visible || !w.onTop || !w.centered || w.w != popupWidth || w.h != popupHeight || w.minW != popupWidth {
@@ -78,7 +83,7 @@ func TestPopupFromTrayAndBack(t *testing.T) {
 func TestPopupFromMinimisedGoesBackToTaskbar(t *testing.T) {
 	var p popup
 	w := &fakeWindow{min: true, max: true, w: 1100, h: 700}
-	if !p.open(w, false) {
+	if !p.open(w, false, true) {
 		t.Fatal("popup did not open from a minimised window")
 	}
 	if w.max {
@@ -93,7 +98,7 @@ func TestPopupFromMinimisedGoesBackToTaskbar(t *testing.T) {
 func TestPopupExpandKeepsWindowOnScreen(t *testing.T) {
 	var p popup
 	w := &fakeWindow{w: 1000, h: 650}
-	p.open(w, true)
+	p.open(w, true, true)
 	p.close(w, true)
 	if !w.visible || w.w != 1000 || w.h != 650 || w.onTop {
 		t.Fatalf("expanded window wrong: %+v", w)
@@ -106,9 +111,9 @@ func TestPopupExpandKeepsWindowOnScreen(t *testing.T) {
 func TestPopupSecondCaptureReusesPopup(t *testing.T) {
 	var p popup
 	w := &fakeWindow{w: 1100, h: 700}
-	p.open(w, true)
+	p.open(w, true, true)
 	w.visible = false
-	if !p.open(w, true) || !w.visible {
+	if !p.open(w, true, true) || !w.visible {
 		t.Fatal("second capture did not bring the popup forward")
 	}
 	p.close(w, false)
@@ -124,7 +129,7 @@ func TestPopupFit(t *testing.T) {
 	if w.h != 700 {
 		t.Fatal("fit changed an inactive window")
 	}
-	p.open(w, true)
+	p.open(w, true, true)
 	// Title bar 32 px: inner 298 of 330. Content 400 tall -> 432.
 	p.fit(w, 400, popupHeight-32)
 	if w.h != 432 {
@@ -147,7 +152,7 @@ func TestPopupKeepsPendingCapture(t *testing.T) {
 	if p.pendingCapture() != nil {
 		t.Fatal("kept a capture without a popup")
 	}
-	p.open(w, true)
+	p.open(w, true, true)
 	c := &api.Capture{Source: "extension"}
 	c.URL = "https://x.test/a.zip"
 	p.captured(c)
@@ -157,5 +162,34 @@ func TestPopupKeepsPendingCapture(t *testing.T) {
 	p.close(w, false)
 	if p.pendingCapture() != nil {
 		t.Fatal("pending kept after close")
+	}
+}
+
+func TestPopupWhenAppBehindBrowser(t *testing.T) {
+	var p popup
+	w := &fakeWindow{visible: true, max: true, w: 1100, h: 700, x: 10, y: 20}
+	if p.open(w, false, false) != canShowBehind {
+		t.Fatalf("open behind = %v, want %v", !canShowBehind, canShowBehind)
+	}
+	if !canShowBehind {
+		return
+	}
+	if w.max || w.w != popupWidth || !w.onTop {
+		t.Fatalf("popup shape wrong: %+v", w)
+	}
+	p.close(w, false)
+	if !w.visible || !w.behind || !w.max || w.w != 1100 || w.h != 700 || w.x != 10 || w.y != 20 || w.onTop {
+		t.Fatalf("window not put back behind: %+v", w)
+	}
+	if p.wasFrom() != fromBehind {
+		t.Fatal("from not recorded")
+	}
+}
+
+func TestPopupNotUsedWhenUserInApp(t *testing.T) {
+	var p popup
+	w := &fakeWindow{visible: true, w: 1100, h: 700}
+	if p.open(w, false, true) {
+		t.Fatal("popup opened while the user was in the app")
 	}
 }
