@@ -44,6 +44,7 @@ export const ru: Strings = {
   "eta.waiting": "Ожидание…",
   "eta.waitingHint": "Несколько секунд нет данных — переподключение или поиск пиров",
   "col.status": "Состояние",
+  "col.date": "Дата",
   "table.label": "Загрузки",
 
   "status.queued": "В очереди",

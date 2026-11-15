@@ -44,6 +44,7 @@ export const it: Strings = {
   "eta.waiting": "In attesa…",
   "eta.waitingHint": "Nessun dato da qualche secondo: riconnessione o ricerca di peer",
   "col.status": "Stato",
+  "col.date": "Data",
   "table.label": "Download",
 
   "status.queued": "In coda",

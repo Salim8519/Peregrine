@@ -23,6 +23,7 @@ test("add via the Add dialog downloads the file with the correct size", async ({
   await expect(r).toBeVisible();
   await expect(r).toHaveAttribute("data-status", "completed", { timeout: 30_000 });
   await expect(r.getByTestId("row-size")).toHaveText("3 MB");
+  await expect(r.getByTestId("row-date")).toHaveText(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/);
   await expect(r.getByTestId("pct")).toHaveText("100%");
   await expect(app.getByTestId("toast").filter({ hasText: "Download complete" })).toBeVisible();
 

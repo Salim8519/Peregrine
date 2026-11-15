@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { KindBadge } from "./KindBadge";
 import { Download } from "../lib/types";
 import { useI18n, StringKey } from "../i18n";
-import { ETA_WAITING, formatBytes, formatETA, formatSpeed } from "../lib/format";
+import { ETA_WAITING, formatBytes, formatDateTime, formatDateTimeLong, formatETA, formatSpeed } from "../lib/format";
 import { isExpired, SortKey } from "../lib/download";
 import { CategoryIcon } from "./FileIcon";
 import { ProgressBar } from "./ProgressBar";
@@ -26,6 +26,7 @@ const COLS: { key: SortKey; label: StringKey; cls: string }[] = [
   { key: "speed", label: "col.speed", cls: "c-speed" },
   { key: "eta", label: "col.eta", cls: "c-eta" },
   { key: "status", label: "col.status", cls: "c-status" },
+  { key: "date", label: "col.date", cls: "c-date" },
 ];
 
 export function DownloadTable({ rows, selected, sortKey, sortDir, onSort, onRowClick, onRowContext, onRowOpen }: Props) {
@@ -79,7 +80,7 @@ interface RowHandlers {
 // Download objects keep their identity until the engine reports a change, so memo skips
 // every row that did not change.
 const DownloadRow = memo(function DownloadRow({ d, sel, h }: { d: Download; sel: boolean; h: RowHandlers }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const expired = isExpired(d);
   return (
     <tr
@@ -123,6 +124,17 @@ const DownloadRow = memo(function DownloadRow({ d, sel, h }: { d: Download; sel:
             <span className={`badge status-${d.status}${expired ? " expired" : ""}`} data-testid="row-status">
               {expired ? t("status.expired") : t(`status.${d.status}`)}
             </span>
+          </td>
+          <td className="c-date num" data-testid="row-date">
+            <bdi
+              title={
+                `${t("detail.added")}: ${formatDateTimeLong(d.createdAt, lang)}` +
+                (d.completedAt ? `
+${t("detail.finished")}: ${formatDateTimeLong(d.completedAt, lang)}` : "")
+              }
+            >
+              {formatDateTime(d.createdAt)}
+            </bdi>
           </td>
         </tr>
   );

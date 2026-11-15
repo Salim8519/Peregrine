@@ -726,6 +726,9 @@ th[aria-sort="descending"] .th-btn {
 .c-status {
   width: 124px;
 }
+.c-date {
+  width: 150px;
+}
 /* the bigger type needs the room back on narrow windows (minimum 820 px wide) */
 .dl-table thead th {
   white-space: nowrap;
@@ -750,6 +753,15 @@ th[aria-sort="descending"] .th-btn {
   }
   .c-status {
     width: 112px;
+  }
+  .c-date {
+    width: 136px;
+  }
+}
+/* narrow windows: the name needs the room more; the date stays in the detail panel */
+@media (max-width: 960px) {
+  .c-date {
+    display: none;
   }
 }
 .dl-table td {

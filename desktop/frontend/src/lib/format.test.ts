@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatBytes, formatETA, formatPercent, formatSpeed, nextSpeedHistory, parseSize, percent } from "./format";
+import { formatBytes, formatDateTime, formatDateTimeLong, formatETA, formatPercent, formatSpeed, nextSpeedHistory, parseSize, percent } from "./format";
 
 describe("formatBytes", () => {
   it("formats binary units", () => {
@@ -82,5 +82,22 @@ describe("nextSpeedHistory", () => {
     expect(next).toHaveLength(60);
     expect(next[0]).toBe(2);
     expect(next[59]).toBe(99);
+  });
+});
+
+describe("formatDateTime", () => {
+  it("shows local date and time as YYYY-MM-DD HH:mm", () => {
+    const d = new Date(2026, 10, 15, 9, 5); // local time
+    expect(formatDateTime(d.toISOString())).toBe("2026-11-15 09:05");
+    expect(formatDateTime(undefined)).toBe("");
+    expect(formatDateTime("not a date")).toBe("");
+  });
+  it("long form follows the language with Latin digits", () => {
+    const iso = new Date(2026, 10, 15, 9, 5).toISOString();
+    expect(formatDateTimeLong(iso, "en")).toMatch(/November/);
+    const ar = formatDateTimeLong(iso, "ar");
+    expect(ar).toMatch(/2026/);
+    expect(ar).not.toMatch(/[٠-٩]/);
+    expect(formatDateTimeLong(undefined)).toBe("");
   });
 });

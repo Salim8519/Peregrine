@@ -44,6 +44,7 @@ export const tr: Strings = {
   "eta.waiting": "Bekleniyor…",
   "eta.waitingHint": "Birkaç saniyedir veri yok — yeniden bağlanıyor veya eş arıyor",
   "col.status": "Durum",
+  "col.date": "Tarih",
   "table.label": "İndirmeler",
 
   "status.queued": "Sırada",

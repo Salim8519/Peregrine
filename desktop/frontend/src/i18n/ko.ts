@@ -44,6 +44,7 @@ export const ko: Strings = {
   "eta.waiting": "대기 중…",
   "eta.waitingHint": "몇 초 동안 데이터 없음 — 다시 연결하거나 피어를 찾는 중",
   "col.status": "상태",
+  "col.date": "날짜",
   "table.label": "다운로드",
 
   "status.queued": "대기 중",

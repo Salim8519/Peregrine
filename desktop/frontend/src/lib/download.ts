@@ -14,7 +14,7 @@ export function matchesStatus(d: Download, f: StatusFilter): boolean {
   return f === "all" || d.status === (f as Status);
 }
 
-export type SortKey = "order" | "name" | "size" | "progress" | "speed" | "eta" | "status";
+export type SortKey = "order" | "name" | "size" | "progress" | "speed" | "eta" | "status" | "date";
 
 const statusRank: Record<Status, number> = { downloading: 0, queued: 1, paused: 2, error: 3, completed: 4 };
 
@@ -35,6 +35,8 @@ export function compareDownloads(a: Download, b: Download, key: SortKey): number
       return (a.eta < 0 ? Infinity : a.eta) - (b.eta < 0 ? Infinity : b.eta);
     case "status":
       return statusRank[a.status] - statusRank[b.status];
+    case "date":
+      return Date.parse(a.createdAt) - Date.parse(b.createdAt) || a.order - b.order;
     default:
       return a.order - b.order;
   }

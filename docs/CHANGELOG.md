@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.1] - 2026-11-15
+
+### Added
+- The downloads list has a Date column with the date and time each download was added
+  (for example 2026-11-15 22:35). Click the header to sort by it; hover to see when it was
+  added and finished.
+- The Windows installer ends with a "Run Peregrine" checkbox, ticked, so the app starts
+  right after installing.
+
 ## [0.5.0] - 2026-11-15
 
 ### Added

@@ -44,6 +44,7 @@ export const ja: Strings = {
   "eta.waiting": "待機中…",
   "eta.waitingHint": "数秒間データがありません — 再接続中またはピアを検索中",
   "col.status": "状態",
+  "col.date": "日付",
   "table.label": "ダウンロード",
 
   "status.queued": "待機中",

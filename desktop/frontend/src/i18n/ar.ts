@@ -44,6 +44,7 @@ export const ar: Strings = {
   "eta.waiting": "ينتظر…",
   "eta.waitingHint": "لا بيانات منذ ثوانٍ — يعيد الاتصال أو يبحث عن نظراء",
   "col.status": "الحالة",
+  "col.date": "التاريخ",
   "table.label": "التنزيلات",
 
   "status.queued": "في الانتظار",

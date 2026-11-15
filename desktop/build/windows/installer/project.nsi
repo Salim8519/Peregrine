@@ -66,6 +66,11 @@ ManifestDPIAware true
 # !insertmacro MUI_PAGE_LICENSE "resources\eula.txt" # Adds a EULA page to the installer
 !insertmacro MUI_PAGE_DIRECTORY # In which folder install page.
 !insertmacro MUI_PAGE_INSTFILES # Installing page.
+# Peregrine: "Run Peregrine" checkbox (ticked) on the finish page. Setup runs elevated, so
+# the app is started through Explorer, which runs it as the signed-in user, not as admin
+# (an elevated download manager would write files as admin). Silent installs skip it.
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_FUNCTION peregrine.launchApp
 !insertmacro MUI_PAGE_FINISH # Finished installation page.
 
 !insertmacro MUI_UNPAGE_INSTFILES # Uinstalling page
@@ -112,6 +117,10 @@ ShowInstDetails show # This will always show the installation details.
     nsExec::Exec `"$SYSDIR\taskkill.exe" /F /IM "peregrine-host.exe"`
     Pop $0
 !macroend
+
+Function peregrine.launchApp
+    Exec '"$WINDIR\explorer.exe" "$INSTDIR\${PRODUCT_EXECUTABLE}"'
+FunctionEnd
 
 Function .onInit
    !insertmacro wails.checkArchitecture

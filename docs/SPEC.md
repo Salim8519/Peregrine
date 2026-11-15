@@ -83,7 +83,7 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
 - Startup to usable window < 1 s on a modern machine.
 
 ## 5. Desktop app (Phase 2)
-- Main list: name, size, progress, speed (live), time left (steady countdown, "Waiting…" when no data arrives; ADR 0019), status; filter by category/status; search.
+- Main list: name, size, progress, speed (live), time left (steady countdown, "Waiting…" when no data arrives; ADR 0019), status, date added (local "YYYY-MM-DD HH:mm"; hover shows added and finished in full; hidden under 960 px wide); filter by category/status; search.
 - Add dialog: URL(s), folder, filename, connections, checksum, start now / add to queue.
   An offered link (extension, clipboard, OS) opens the short form: name, size, folder, with
   "More details" for the rest. While the app is in the tray or minimised it opens as a

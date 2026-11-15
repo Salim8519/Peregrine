@@ -48,6 +48,31 @@ export function formatETA(sec: number): string {
   return `${Math.floor(sec / 86400)}d ${Math.floor((sec % 86400) / 3600)}h`;
 }
 
+/**
+ * Date and time for the downloads table, in local time: "2026-11-15 09:05". Short, the same
+ * in every language and direction, and it sorts as it reads. Invalid or missing -> "".
+ */
+export function formatDateTime(iso: string | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const p = (x: number) => String(x).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+/** Full date and time in the app language with Latin digits (tooltips). Invalid -> "". */
+export function formatDateTimeLong(iso: string | undefined, lang = "en"): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const o: Intl.DateTimeFormatOptions = { dateStyle: "full", timeStyle: "short" };
+  try {
+    return d.toLocaleString(`${lang}-u-nu-latn`, o);
+  } catch {
+    return d.toLocaleString(undefined, o);
+  }
+}
+
 /** Progress in [0, 100], or -1 when the total size is unknown. */
 export function percent(downloaded: number, size: number): number {
   if (size <= 0) return -1;

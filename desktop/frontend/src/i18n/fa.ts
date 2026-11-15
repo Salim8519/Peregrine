@@ -43,6 +43,7 @@ export const fa: Strings = {
   "eta.waiting": "در انتظار…",
   "eta.waitingHint": "چند ثانیه است داده‌ای نرسیده — در حال اتصال دوباره یا یافتن همتا",
   "col.status": "وضعیت",
+  "col.date": "تاریخ",
   "table.label": "دانلودها",
 
   "status.queued": "در صف",

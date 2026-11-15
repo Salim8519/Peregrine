@@ -43,6 +43,7 @@ export const ur: Strings = {
   "eta.waiting": "انتظار…",
   "eta.waitingHint": "چند سیکنڈ سے کوئی ڈیٹا نہیں — دوبارہ جڑ رہا ہے یا ہم منصب تلاش کر رہا ہے",
   "col.status": "حالت",
+  "col.date": "تاریخ",
   "table.label": "ڈاؤن لوڈز",
 
   "status.queued": "قطار میں",

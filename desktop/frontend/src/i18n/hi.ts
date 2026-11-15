@@ -43,6 +43,7 @@ export const hi: Strings = {
   "eta.waiting": "प्रतीक्षा…",
   "eta.waitingHint": "कुछ सेकंड से कोई डेटा नहीं — फिर से जुड़ रहा है या पीयर खोज रहा है",
   "col.status": "स्थिति",
+  "col.date": "तारीख",
   "table.label": "डाउनलोड",
 
   "status.queued": "कतार में",

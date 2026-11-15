@@ -42,6 +42,7 @@ export const en = {
   "eta.waiting": "Waiting…",
   "eta.waitingHint": "No data for a few seconds — reconnecting or looking for peers",
   "col.status": "Status",
+  "col.date": "Date",
   "table.label": "Downloads",
 
   "status.queued": "Queued",

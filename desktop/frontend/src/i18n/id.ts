@@ -44,6 +44,7 @@ export const id: Strings = {
   "eta.waiting": "Menunggu…",
   "eta.waitingHint": "Tidak ada data beberapa detik — menyambung ulang atau mencari peer",
   "col.status": "Status",
+  "col.date": "Tanggal",
   "table.label": "Unduhan",
 
   "status.queued": "Antre",

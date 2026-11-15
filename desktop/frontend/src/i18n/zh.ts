@@ -44,6 +44,7 @@ export const zh: Strings = {
   "eta.waiting": "等待中…",
   "eta.waitingHint": "几秒内没有数据 — 正在重新连接或寻找节点",
   "col.status": "状态",
+  "col.date": "日期",
   "table.label": "下载列表",
 
   "status.queued": "排队中",

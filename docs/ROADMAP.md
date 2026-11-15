@@ -43,6 +43,7 @@ v0.2.0 released 2026-11-14: scheduler, tray, notifications, start at sign-in, 16
 - [x] End-to-end tests: UI ↔ real engine (Playwright), browser ↔ extension ↔ host ↔ app (Playwright), CLI kill-and-resume
 - [x] i18n: 16 languages, RTL for Arabic/Persian/Urdu
 - [x] Windows installer (NSIS) + portable zip + macOS DMG (universal) — built by the release workflow
+- [x] Date column in the list; installer offers to start Peregrine at the end (0.5.1)
 - [ ] Signed auto-update
   - [x] Step 1: update check + "new version" notice, user can turn it off (ADR 0020)
   - [ ] Step 2: signed download and install (Windows first; own ADR)
