@@ -3,9 +3,7 @@
 package main
 
 import (
-	"os"
 	"sync/atomic"
-	"unsafe"
 
 	"golang.org/x/sys/windows"
 )
@@ -45,22 +43,7 @@ const (
 )
 
 // mainWindow finds this process's Wails window (class "wailsWindow").
-func mainWindow() windows.HWND {
-	class, _ := windows.UTF16PtrFromString("wailsWindow")
-	pid := uint32(os.Getpid())
-	var h uintptr
-	for i := 0; i < 64; i++ {
-		h, _, _ = procFindWindowEx.Call(0, h, uintptr(unsafe.Pointer(class)), 0)
-		if h == 0 {
-			return 0
-		}
-		var owner uint32
-		if _, err := windows.GetWindowThreadProcessId(windows.HWND(h), &owner); err == nil && owner == pid {
-			return windows.HWND(h)
-		}
-	}
-	return 0
-}
+func mainWindow() windows.HWND { return windows.HWND(ownWindow("wailsWindow")) }
 
 // showWindowBehind shows the hidden main window at the bottom of the z-order without
 // activating it, and gives the focus back to the window that was in front (the browser).

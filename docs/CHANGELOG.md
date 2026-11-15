@@ -4,6 +4,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+### Added
+- Windows: when Peregrine goes to the tray (closing the window, or finishing the quick-add
+  popup), the window slides toward its tray icon and fades out in about a quarter of a
+  second, so you can see where it went. It follows the taskbar wherever it is and is
+  skipped when Windows animation effects are turned off.
+
 ## [0.5.2] - 2026-11-15
 
 ### Fixed

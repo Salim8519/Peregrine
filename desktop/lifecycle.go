@@ -282,7 +282,9 @@ func (l *life) beforeClose(ctx context.Context) bool {
 	if !l.app.m.Settings().CloseToTray || !l.tray.ready.Load() {
 		return false
 	}
+	restore := flyToTray() // show the user where the window went
 	wruntime.WindowHide(ctx)
+	restore()
 	l.mu.Lock()
 	l.setHiddenLocked(true)
 	first := !l.toldHidden

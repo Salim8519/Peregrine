@@ -38,6 +38,9 @@ type window interface {
 	minimise()
 	show()
 	hide()
+	// flyToTray plays the short "fly to the tray" animation and returns a function that
+	// undoes it (call it after hide).
+	flyToTray() (restore func())
 	setOnTop(on bool)
 	// showBehind shows the window again without taking the focus, below the other windows
 	// (the browser stays in front). Windows only; see canShowBehind.
@@ -127,9 +130,14 @@ func (p *popup) close(w window, expand bool) bool {
 	w.setOnTop(false)
 	if !expand {
 		// Hide first, then restore the shape, so the user never sees the big window.
-		if p.from == fromMin {
+		switch p.from {
+		case fromMin:
 			w.minimise()
-		} else {
+		case fromTray:
+			restore := w.flyToTray() // show where the window went
+			w.hide()
+			restore()
+		default:
 			w.hide()
 		}
 	}
@@ -204,6 +212,7 @@ func (w wailsWindow) unmaximise()               { wruntime.WindowUnmaximise(w.ct
 func (w wailsWindow) maximise()                 { wruntime.WindowMaximise(w.ctx) }
 func (w wailsWindow) minimise()                 { wruntime.WindowMinimise(w.ctx) }
 func (w wailsWindow) hide()                     { wruntime.WindowHide(w.ctx) }
+func (w wailsWindow) flyToTray() func()         { return flyToTray() }
 func (w wailsWindow) setOnTop(on bool)          { wruntime.WindowSetAlwaysOnTop(w.ctx, on) }
 func (w wailsWindow) showBehind(maximised bool) { showWindowBehind(maximised) }
 func (w wailsWindow) rememberFront()            { rememberFrontWindow() }

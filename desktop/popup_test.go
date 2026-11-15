@@ -35,8 +35,22 @@ func (f *fakeWindow) maximise()            { f.max = true }
 func (f *fakeWindow) minimise()            { f.min, f.visible = true, false }
 func (f *fakeWindow) show()                { f.min, f.visible = false, true }
 func (f *fakeWindow) hide()                { f.visible = false }
-func (f *fakeWindow) setOnTop(on bool)     { f.onTop = on }
-func (f *fakeWindow) rememberFront()       { f.events = append(f.events, "front") }
+func (f *fakeWindow) flyToTray() func() {
+	ev := "fly"
+	if !f.visible {
+		ev = "fly-while-hidden" // the animation must run before the window hides
+	}
+	f.events = append(f.events, ev)
+	return func() {
+		ev := "unfly"
+		if f.visible {
+			ev = "unfly-while-visible" // the restore must run after the window hides
+		}
+		f.events = append(f.events, ev)
+	}
+}
+func (f *fakeWindow) setOnTop(on bool) { f.onTop = on }
+func (f *fakeWindow) rememberFront()   { f.events = append(f.events, "front") }
 func (f *fakeWindow) showBehind(max bool) {
 	f.visible, f.behind, f.max = true, true, max
 }
@@ -72,7 +86,8 @@ func TestPopupFromTrayAndBack(t *testing.T) {
 	if w.visible || w.onTop || w.w != 1100 || w.h != 700 || w.x != 40 || w.y != 50 || w.minW != mainMinW || w.minH != mainMinH {
 		t.Fatalf("window not restored: %+v", w)
 	}
-	if !slices.Equal(w.events, []string{"open", "closed"}) {
+	// Going back to the tray flies the window there, then undoes the animation once hidden.
+	if !slices.Equal(w.events, []string{"open", "fly", "unfly", "closed"}) {
 		t.Fatalf("events = %v", w.events)
 	}
 	if p.close(w, false) {
@@ -92,6 +107,9 @@ func TestPopupFromMinimisedGoesBackToTaskbar(t *testing.T) {
 	p.close(w, false)
 	if !w.min || !w.max || w.visible {
 		t.Fatalf("window not minimised+maximised again: %+v", w)
+	}
+	if slices.Contains(w.events, "fly") {
+		t.Fatalf("a minimised window flew to the tray: %v", w.events)
 	}
 }
 
