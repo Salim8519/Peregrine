@@ -15,5 +15,7 @@
   "action.sleep": "Ruhezustand wird aktiviert",
   "action.shutdown": "Computer wird heruntergefahren",
   "updateAvailable": "Peregrine {version} ist verfügbar",
-  "updateBody": "Öffne Peregrine, um die neue Version herunterzuladen."
+  "updateBody": "Öffne Peregrine, um die neue Version herunterzuladen.",
+  "openFile": "Datei öffnen",
+  "openFolder": "Im Ordner anzeigen"
 }

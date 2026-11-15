@@ -15,5 +15,7 @@
   "action.sleep": "Mise en veille",
   "action.shutdown": "Arrêt de l’ordinateur",
   "updateAvailable": "Peregrine {version} est disponible",
-  "updateBody": "Ouvrez Peregrine pour télécharger la nouvelle version."
+  "updateBody": "Ouvrez Peregrine pour télécharger la nouvelle version.",
+  "openFile": "Ouvrir le fichier",
+  "openFolder": "Afficher dans le dossier"
 }

@@ -38,7 +38,7 @@ import {
 } from "./lib/download";
 import { looksDownloadable, parseBatch } from "./lib/batch";
 import { formatSpeed, nextSpeedHistory } from "./lib/format";
-import { cancelPowerAction, onPower, PowerEvent, setFocused } from "./lib/desktop";
+import { cancelPowerAction, onPopup, onPower, popupActive, popupDone, popupFit, popupPending, PowerEvent, setFocused } from "./lib/desktop";
 import { PowerDialog, ScheduleBadge } from "./components/Schedule";
 
 /** Keeps a number+unit like "4.6 MB/s" in order inside Arabic sentences (Unicode LRI ... PDI). */
@@ -124,6 +124,43 @@ export default function App() {
       window.removeEventListener("blur", off);
     };
   }, []);
+
+  // Quick-add popup (ADR 0021): while the window is the small popup, only the add dialog shows.
+  const [popup, setPopup] = useState(false);
+  useEffect(() => {
+    // Loaded while already showing as the popup (a link right after start): pick up its link.
+    const pickUp = () =>
+      void popupPending().then((c) => c && setModal((m) => (m?.type === "add" ? m : { type: "add", initial: c })));
+    void popupActive().then((on) => {
+      if (!on) return;
+      setPopup(true);
+      pickUp();
+    });
+    return onPopup((mode) => {
+      setPopup(mode === "open");
+      // Back in the tray (popup closed from its title bar): drop the half-filled dialog.
+      if (mode === "closed") setModal((m) => (m?.type === "add" ? null : m));
+    });
+  }, []);
+  const popupRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!popup) return;
+    const el = popupRef.current?.firstElementChild as HTMLElement | null;
+    if (!el) return;
+    const fit = () => popupFit(el.getBoundingClientRect().height);
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [popup, modal]);
+  // A popup without a captured link to show (should not happen): don't leave it empty.
+  useEffect(() => {
+    if (!popup || modal?.type === "add") return;
+    const id = window.setTimeout(() => {
+      void popupPending().then((c) => (c ? setModal({ type: "add", initial: c }) : popupDone(false)));
+    }, 3000);
+    return () => window.clearTimeout(id);
+  }, [popup, modal]);
 
   // Scheduler when-done countdown, driven by the desktop app.
   const [power, setPower] = useState<PowerEvent | null>(null);
@@ -415,6 +452,28 @@ export default function App() {
   const modalDownload = modal && (modal.type === "refresh" || modal.type === "limit") ? downloads.get(modal.id) : undefined;
   const t = tr;
 
+  if (popup) {
+    return (
+      <I18nProvider lang={lang}>
+        <div className="popup-root" ref={popupRef}>
+          {modal?.type === "add" && (
+            <AddDialog
+              key={modal.initial.url}
+              client={api}
+              settings={settings}
+              initial={modal.initial}
+              bare
+              onClose={() => {
+                setModal(null);
+                popupDone(false);
+              }}
+            />
+          )}
+        </div>
+      </I18nProvider>
+    );
+  }
+
   return (
     <I18nProvider lang={lang}>
       <div className="app">
@@ -603,7 +662,7 @@ export default function App() {
           />
         )}
 
-        {modal?.type === "add" && <AddDialog client={api} settings={settings} initial={modal.initial} onClose={() => setModal(null)} />}
+        {modal?.type === "add" && <AddDialog key={modal.initial.url} client={api} settings={settings} initial={modal.initial} onClose={() => setModal(null)} />}
         {modal?.type === "batch" && (
           <BatchDialog
             client={api}

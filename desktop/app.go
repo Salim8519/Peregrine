@@ -30,6 +30,7 @@ type App struct {
 	initErr        error
 	closeProtocols func() // releases torrent ports etc. after the engine stops
 	life           *life
+	pop            popup // quick-add popup state (popup.go)
 }
 
 // NewApp creates the app; the engine starts in startup.
@@ -71,7 +72,7 @@ func (a *App) initEngine() error {
 	a.svc = api.NewService(m, api.Hooks{
 		OpenPath:   openPath,
 		RevealPath: revealPath,
-		ShowWindow: a.showWindow,
+		ShowWindow: a.showForCapture, // only captures call it: quick-add popup when hidden
 		PickFolder: func(current string) (string, error) {
 			return wruntime.OpenDirectoryDialog(a.ctx, wruntime.OpenDialogOptions{
 				DefaultDirectory:     current,
@@ -89,6 +90,9 @@ func (a *App) initEngine() error {
 	})
 	a.svc.SetBrowserStateFile(filepath.Join(dir, "browser.json"))
 	a.unsub = a.svc.Subscribe(func(e api.Event) {
+		if e.Type == "capture" {
+			a.pop.captured(e.Capture)
+		}
 		if forwardToUI(e, a.life.uiHidden.Load()) {
 			wruntime.EventsEmit(a.ctx, "peregrine:event", e)
 		}
@@ -184,6 +188,8 @@ func (a *App) showWindow() {
 	if a.ctx == nil {
 		return
 	}
+	// Tray click, notification, when-done countdown: the popup grows into the full app.
+	a.pop.close(wailsWindow{a.ctx}, true)
 	a.life.mu.Lock()
 	a.life.setHiddenLocked(false)
 	a.life.mu.Unlock()
@@ -201,10 +207,18 @@ func (a *App) showWindow() {
 }
 
 func (a *App) onSecondInstance(data options.SecondInstanceData) {
-	a.showWindow()
-	if u := urlArg(data.Args); u != "" {
-		a.captureURL(u)
+	a.openLink(urlArg(data.Args))
+}
+
+// openLink handles a link handed over by the OS or a second launch. The capture shows
+// the add dialog itself (the quick-add popup while in the tray), so the full window only
+// opens when there is no link.
+func (a *App) openLink(u string) {
+	if u == "" {
+		a.showWindow()
+		return
 	}
+	a.captureURL(u)
 }
 
 func (a *App) captureURL(u string) {
@@ -248,10 +262,7 @@ func torrentFileURL(path string) string {
 
 // onFileOpen handles .torrent files macOS hands to the app (double-click in Finder).
 func (a *App) onFileOpen(path string) {
-	a.showWindow()
-	if u := torrentFileURL(path); u != "" {
-		a.captureURL(u)
-	}
+	a.openLink(torrentFileURL(path))
 }
 
 // onFileDrop adds .torrent files dropped onto the window.
@@ -265,10 +276,7 @@ func (a *App) onFileDrop(_, _ int, paths []string) {
 
 // onURLOpen handles links macOS hands to the app (magnet: links).
 func (a *App) onURLOpen(u string) {
-	a.showWindow()
-	if v := urlArg([]string{u}); v != "" {
-		a.captureURL(v)
-	}
+	a.openLink(urlArg([]string{u}))
 }
 
 // Call is the single binding used by the frontend: JSON params in, JSON result out.

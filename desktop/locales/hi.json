@@ -15,5 +15,7 @@
   "action.sleep": "स्लीप मोड",
   "action.shutdown": "कंप्यूटर शट डाउन हो रहा है",
   "updateAvailable": "Peregrine {version} उपलब्ध है",
-  "updateBody": "नया संस्करण डाउनलोड करने के लिए Peregrine खोलें।"
+  "updateBody": "नया संस्करण डाउनलोड करने के लिए Peregrine खोलें।",
+  "openFile": "फ़ाइल खोलें",
+  "openFolder": "फ़ोल्डर में दिखाएँ"
 }

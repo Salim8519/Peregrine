@@ -15,5 +15,7 @@
   "action.sleep": "Suspendiendo el equipo",
   "action.shutdown": "Apagando el equipo",
   "updateAvailable": "Peregrine {version} está disponible",
-  "updateBody": "Abre Peregrine para descargar la nueva versión."
+  "updateBody": "Abre Peregrine para descargar la nueva versión.",
+  "openFile": "Abrir archivo",
+  "openFolder": "Mostrar en carpeta"
 }

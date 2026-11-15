@@ -15,5 +15,7 @@
   "action.sleep": "سيدخل الجهاز في وضع السكون",
   "action.shutdown": "سيُطفأ الجهاز",
   "updateAvailable": "الإصدار {version} من Peregrine متوفر",
-  "updateBody": "افتح Peregrine لتنزيل الإصدار الجديد."
+  "updateBody": "افتح Peregrine لتنزيل الإصدار الجديد.",
+  "openFile": "فتح الملف",
+  "openFolder": "فتح المجلد"
 }

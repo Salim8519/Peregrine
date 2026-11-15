@@ -15,5 +15,7 @@
   "action.sleep": "Uyku moduna geçiliyor",
   "action.shutdown": "Bilgisayar kapatılıyor",
   "updateAvailable": "Peregrine {version} kullanılabilir",
-  "updateBody": "Yeni sürümü indirmek için Peregrine'i açın."
+  "updateBody": "Yeni sürümü indirmek için Peregrine'i açın.",
+  "openFile": "Dosyayı aç",
+  "openFolder": "Klasörde göster"
 }

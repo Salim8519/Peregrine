@@ -112,6 +112,9 @@ export const ko: Strings = {
   "add.fromExtension": "브라우저에서 보냄",
   "add.fromClipboard": "복사한 링크",
   "add.invalidUrl": "http:// 또는 https:// 링크를 입력하세요",
+  "add.moreDetails": "자세히 보기",
+  "add.fewerDetails": "간단히 보기",
+  "add.checkingSize": "크기 확인 중…",
 
   "batch.title": "일괄 추가",
   "batch.hint": "한 줄에 링크를 하나씩 붙여 넣으세요. file[001-100].zip 같은 패턴은 여러 링크로 펼쳐집니다.",

@@ -110,6 +110,9 @@ export const en = {
   "add.fromExtension": "Offered by your browser",
   "add.fromClipboard": "Copied link",
   "add.invalidUrl": "Enter an http:// or https:// link",
+  "add.moreDetails": "More details",
+  "add.fewerDetails": "Fewer details",
+  "add.checkingSize": "Checking size…",
 
   "batch.title": "Batch add",
   "batch.hint": "Paste one link per line. Patterns like file[001-100].zip expand to many links.",

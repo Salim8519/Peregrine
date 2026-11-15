@@ -15,5 +15,7 @@
   "action.sleep": "进入睡眠",
   "action.shutdown": "关机",
   "updateAvailable": "Peregrine {version} 已发布",
-  "updateBody": "打开 Peregrine 下载新版本。"
+  "updateBody": "打开 Peregrine 下载新版本。",
+  "openFile": "打开文件",
+  "openFolder": "在文件夹中显示"
 }

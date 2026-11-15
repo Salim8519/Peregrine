@@ -111,6 +111,9 @@ export const hi: Strings = {
   "add.fromExtension": "आपके ब्राउज़र से मिला",
   "add.fromClipboard": "कॉपी किया गया लिंक",
   "add.invalidUrl": "http:// या https:// वाला लिंक डालें",
+  "add.moreDetails": "अधिक विवरण",
+  "add.fewerDetails": "कम विवरण",
+  "add.checkingSize": "आकार जाँचा जा रहा है…",
 
   "batch.title": "बैच में जोड़ें",
   "batch.hint": "हर पंक्ति में एक लिंक पेस्ट करें। file[001-100].zip जैसे पैटर्न कई लिंक में बदल जाते हैं।",

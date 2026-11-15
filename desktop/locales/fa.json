@@ -15,5 +15,7 @@
   "action.sleep": "رفتن به حالت خواب",
   "action.shutdown": "خاموش شدن رایانه",
   "updateAvailable": "نسخهٔ {version} از Peregrine در دسترس است",
-  "updateBody": "برای دانلود نسخهٔ جدید، Peregrine را باز کنید."
+  "updateBody": "برای دانلود نسخهٔ جدید، Peregrine را باز کنید.",
+  "openFile": "باز کردن فایل",
+  "openFolder": "نمایش در پوشه"
 }

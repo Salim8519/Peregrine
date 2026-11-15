@@ -112,6 +112,9 @@ export const es: Strings = {
   "add.fromExtension": "Enviado por tu navegador",
   "add.fromClipboard": "Enlace copiado",
   "add.invalidUrl": "Introduce un enlace http:// o https://",
+  "add.moreDetails": "Más detalles",
+  "add.fewerDetails": "Menos detalles",
+  "add.checkingSize": "Comprobando tamaño…",
 
   "batch.title": "Añadir en lote",
   "batch.hint": "Pega un enlace por línea. Patrones como file[001-100].zip se expanden en muchos enlaces.",

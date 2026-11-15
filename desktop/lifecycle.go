@@ -37,15 +37,17 @@ type life struct {
 	hiddenSince time.Time // when hidden last became true (memory trimming)
 	// uiHidden mirrors hidden without l.mu, for the engine event path: engine subscribers run
 	// under the engine lock, and l.mu is sometimes held while calling the engine.
-	uiHidden     atomic.Bool
-	toldHidden   bool // "still running in the tray" shown once per run
-	quitting     bool
-	notifyOK     bool
-	powerTimer   *time.Timer
-	powerAction  string
-	autostartSet bool
-	autostartOn  bool
-	updateSeen   string // newest version already announced this run
+	uiHidden      atomic.Bool
+	toldHidden    bool // "still running in the tray" shown once per run
+	quitting      bool
+	notifyOK      bool
+	notifyLang    string // language the notification buttons were registered in
+	notifyLangSet bool
+	powerTimer    *time.Timer
+	powerAction   string
+	autostartSet  bool
+	autostartOn   bool
+	updateSeen    string // newest version already announced this run
 
 	// Engine events are queued and handled on one goroutine, in order. The engine calls
 	// subscribers while holding its lock, so handling them inline must never call back into
@@ -140,7 +142,8 @@ func (l *life) start(ctx context.Context) {
 		} else {
 			l.setNotifyOK(true)
 		}
-		wruntime.OnNotificationResponse(ctx, func(wruntime.NotificationResult) { l.app.showWindow() })
+		l.registerDoneCategory(st.Language)
+		wruntime.OnNotificationResponse(ctx, l.onNotification)
 	} else if err != nil {
 		log.Printf("peregrine: notifications unavailable: %v", err)
 	}
@@ -193,6 +196,7 @@ func (l *life) handle(e api.Event) {
 	case engine.EventSettings:
 		if e.Settings != nil {
 			l.tray.settingsChanged(*e.Settings)
+			l.registerDoneCategory(e.Settings.Language)
 			go l.syncAutostart(e.Settings.LaunchAtLogin)
 		}
 	case engine.EventQueueDone:
@@ -217,7 +221,7 @@ func (l *life) downloadChanged(d engine.Download) {
 	}
 	switch d.Status {
 	case engine.StatusCompleted:
-		l.notify("done-"+d.ID, func(s uiStrings) string { return s.get("completed") }, d.Filename)
+		l.notifyDone(d)
 	case engine.StatusError:
 		l.notify("err-"+d.ID, func(s uiStrings) string { return s.get("failed") }, d.Filename+"\n"+d.Error)
 	}
@@ -226,13 +230,18 @@ func (l *life) downloadChanged(d engine.Download) {
 	}
 }
 
-// notify shows a system notification when the user is not looking at the window.
-func (l *life) notify(id string, title func(uiStrings) string, body string) {
-	st := l.app.m.Settings()
+// shouldNotify: notifications are on and the user is not looking at the window.
+func (l *life) shouldNotify(st engine.Settings) bool {
 	l.mu.Lock()
 	ok := l.notifyOK && st.Notify && (l.hidden || !l.focused)
 	l.mu.Unlock()
-	if !ok || l.app.ctx == nil {
+	return ok && l.app.ctx != nil
+}
+
+// notify shows a system notification when the user is not looking at the window.
+func (l *life) notify(id string, title func(uiStrings) string, body string) {
+	st := l.app.m.Settings()
+	if !l.shouldNotify(st) {
 		return
 	}
 	go func() {
@@ -264,6 +273,11 @@ func (l *life) beforeClose(ctx context.Context) bool {
 	l.mu.Unlock()
 	if quitting || runtime.GOOS == "darwin" || l.app.m == nil {
 		return false
+	}
+	// The popup's close button cancels the quick add and goes back where the window was.
+	if l.app.pop.isActive() {
+		l.app.PopupDone(false)
+		return true
 	}
 	if !l.app.m.Settings().CloseToTray || !l.tray.ready.Load() {
 		return false

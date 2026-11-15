@@ -15,5 +15,7 @@
   "action.sleep": "Masuk mode tidur",
   "action.shutdown": "Mematikan komputer",
   "updateAvailable": "Peregrine {version} tersedia",
-  "updateBody": "Buka Peregrine untuk mengunduh versi baru."
+  "updateBody": "Buka Peregrine untuk mengunduh versi baru.",
+  "openFile": "Buka file",
+  "openFolder": "Tampilkan di folder"
 }

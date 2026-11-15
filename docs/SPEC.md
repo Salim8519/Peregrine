@@ -85,13 +85,16 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
 ## 5. Desktop app (Phase 2)
 - Main list: name, size, progress, speed (live), time left (steady countdown, "Waiting…" when no data arrives; ADR 0019), status; filter by category/status; search.
 - Add dialog: URL(s), folder, filename, connections, checksum, start now / add to queue.
+  An offered link (extension, clipboard, OS) opens the short form: name, size, folder, with
+  "More details" for the rest. While the app is in the tray or minimised it opens as a
+  small popup window instead of the whole app (ADR 0021).
 - Batch add: paste many links; pattern links (`file[001-100].zip`).
 - Clipboard monitor (opt-in): a copied downloadable link opens the add dialog. This is the
   capture method for browsers without our extension (e.g. Safari, Firefox in v1).
 - Tray (Windows, Linux) / menu-bar (macOS) icon with open, pause all, resume all, schedule
   on/off and quit; closing the window keeps the app in the tray (setting; on macOS the close
   button hides the app as usual). System notifications on finish/error while the window is
-  not focused (setting).
+  not focused (setting); the finish notification has Open file and Show in folder buttons.
 - Start when the user signs in (opt-in), hidden in the tray: HKCU Run key (Windows),
   LaunchAgent (macOS), XDG autostart (Linux).
 - Themes: Field Guide (default; day and night editions that follow the system) and

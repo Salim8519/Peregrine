@@ -112,6 +112,9 @@ export const ja: Strings = {
   "add.fromExtension": "ブラウザーから送信",
   "add.fromClipboard": "コピーしたリンク",
   "add.invalidUrl": "http:// または https:// のリンクを入力してください",
+  "add.moreDetails": "詳細を表示",
+  "add.fewerDetails": "詳細を隠す",
+  "add.checkingSize": "サイズを確認中…",
 
   "batch.title": "一括追加",
   "batch.hint": "1 行に 1 つずつリンクを貼り付けてください。file[001-100].zip のようなパターンは複数のリンクに展開されます。",

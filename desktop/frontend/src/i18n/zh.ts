@@ -112,6 +112,9 @@ export const zh: Strings = {
   "add.fromExtension": "来自浏览器",
   "add.fromClipboard": "已复制的链接",
   "add.invalidUrl": "请输入 http:// 或 https:// 链接",
+  "add.moreDetails": "更多详情",
+  "add.fewerDetails": "收起详情",
+  "add.checkingSize": "正在获取大小…",
 
   "batch.title": "批量添加",
   "batch.hint": "每行粘贴一个链接。file[001-100].zip 这样的模式会展开为多个链接。",

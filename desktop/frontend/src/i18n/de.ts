@@ -112,6 +112,9 @@ export const de: Strings = {
   "add.fromExtension": "Von Ihrem Browser angeboten",
   "add.fromClipboard": "Kopierter Link",
   "add.invalidUrl": "Geben Sie einen http://- oder https://-Link ein",
+  "add.moreDetails": "Mehr Details",
+  "add.fewerDetails": "Weniger Details",
+  "add.checkingSize": "Größe wird ermittelt…",
 
   "batch.title": "Mehrere hinzufügen",
   "batch.hint": "Fügen Sie einen Link pro Zeile ein. Muster wie file[001-100].zip werden zu vielen Links erweitert.",

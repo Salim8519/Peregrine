@@ -285,9 +285,17 @@ test("capture event from the extension opens a prefilled Add dialog", async ({ a
   expect(res.prompted).toBe(true);
   const dlg = app.getByTestId("add-dialog");
   await expect(dlg).toBeVisible();
+  // Short form first: name, size and folder; the address and the rest under "More details".
+  await expect(dlg.getByTestId("quick-name")).toHaveText("e2e-captured.bin");
+  await expect(dlg.getByTestId("quick-size")).toHaveText(/KB/);
+  await expect(dlg.getByTestId("add-dir")).toBeVisible();
+  await expect(dlg.getByTestId("add-url")).toHaveCount(0);
+  await dlg.getByTestId("add-more").click();
   await expect(dlg.getByTestId("add-url")).toHaveValue(url);
   await expect(dlg).toContainText("Offered by your browser");
   await expect(dlg.getByTestId("probe-name")).toHaveText("e2e-captured.bin");
+  await dlg.getByTestId("add-more").click();
+  await expect(dlg.getByTestId("quick-name")).toHaveText("e2e-captured.bin");
   await dlg.getByTestId("add-start").click();
   await expect(row(app, "e2e-captured.bin")).toHaveAttribute("data-status", "completed");
   await app.screenshot({ path: "test-results/screenshot-main.png" });

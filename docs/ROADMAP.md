@@ -37,6 +37,7 @@ v0.2.0 released 2026-11-14: scheduler, tray, notifications, start at sign-in, 16
 - [x] Categories and folders (Q4), duplicate handling (Q5)
 - [x] Tray / menu-bar icon, native notifications, start at sign-in (ADR 0010)
 - [x] Clipboard monitor (capture without extension)
+- [x] Quick-add popup for browser downloads + Open file / Show in folder on the done notification (ADR 0021)
 - [x] Settings screen
 - [x] Scheduler (Q3): time window, days, stop requeues, when-done action
 - [x] End-to-end tests: UI ↔ real engine (Playwright), browser ↔ extension ↔ host ↔ app (Playwright), CLI kill-and-resume

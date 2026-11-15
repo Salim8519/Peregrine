@@ -112,6 +112,9 @@ export const ar: Strings = {
   "add.fromExtension": "مقترح من متصفحك",
   "add.fromClipboard": "رابط منسوخ",
   "add.invalidUrl": "أدخل رابطًا يبدأ بـ http:// أو https://",
+  "add.moreDetails": "تفاصيل أكثر",
+  "add.fewerDetails": "تفاصيل أقل",
+  "add.checkingSize": "جارٍ معرفة الحجم…",
 
   "batch.title": "إضافة دفعة",
   "batch.hint": "الصق رابطًا في كل سطر. الأنماط مثل file[001-100].zip تتوسع إلى روابط كثيرة.",

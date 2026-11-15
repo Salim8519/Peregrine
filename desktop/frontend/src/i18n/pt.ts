@@ -112,6 +112,9 @@ export const pt: Strings = {
   "add.fromExtension": "Enviado pelo seu navegador",
   "add.fromClipboard": "Link copiado",
   "add.invalidUrl": "Digite um link http:// ou https://",
+  "add.moreDetails": "Mais detalhes",
+  "add.fewerDetails": "Menos detalhes",
+  "add.checkingSize": "Verificando tamanho…",
 
   "batch.title": "Adicionar em lote",
   "batch.hint": "Cole um link por linha. Padrões como file[001-100].zip geram vários links.",

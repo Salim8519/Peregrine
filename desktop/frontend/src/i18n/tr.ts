@@ -112,6 +112,9 @@ export const tr: Strings = {
   "add.fromExtension": "Tarayıcınızdan gönderildi",
   "add.fromClipboard": "Kopyalanan bağlantı",
   "add.invalidUrl": "http:// veya https:// ile başlayan bir bağlantı girin",
+  "add.moreDetails": "Daha fazla ayrıntı",
+  "add.fewerDetails": "Daha az ayrıntı",
+  "add.checkingSize": "Boyut denetleniyor…",
 
   "batch.title": "Toplu ekle",
   "batch.hint": "Her satıra bir bağlantı yapıştırın. file[001-100].zip gibi kalıplar birçok bağlantıya dönüştürülür.",

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { FolderOpen, LoaderCircle, Play, Plus } from "lucide-react";
+import { ChevronDown, FolderOpen, LoaderCircle, Play, Plus } from "lucide-react";
 import { Dialog } from "./Dialog";
 import { CategoryIcon } from "./FileIcon";
 import { useI18n } from "../i18n";
 import { Client } from "../lib/api";
 import { formatBytes } from "../lib/format";
 import { isDownloadURL } from "../lib/batch";
+import { nameFromURL, startsCompact } from "../lib/quickadd";
 import { Capture, DownloadKind, ProbeInfo, Settings } from "../lib/types";
 import { KindBadge } from "./KindBadge";
 
@@ -16,9 +17,11 @@ interface Props {
   settings: Settings | null;
   initial: AddInitial;
   onClose: () => void;
+  /** Fill the window without an overlay (the quick-add popup). */
+  bare?: boolean;
 }
 
-export function AddDialog({ client, settings, initial, onClose }: Props) {
+export function AddDialog({ client, settings, initial, onClose, bare }: Props) {
   const { t } = useI18n();
   const [url, setUrl] = useState(initial.url ?? "");
   const [dir, setDir] = useState(initial.dir ?? "");
@@ -32,6 +35,8 @@ export function AddDialog({ client, settings, initial, onClose }: Props) {
   const [probeError, setProbeError] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  // A captured link opens the short form (name, folder, size); the rest is one click away.
+  const [more, setMore] = useState(() => !startsCompact(initial));
   const seq = useRef(0);
   const headers = initial.headers;
 
@@ -99,13 +104,36 @@ export function AddDialog({ client, settings, initial, onClose }: Props) {
     }
   };
 
+  const kind: DownloadKind | undefined = videoPage ? "video" : probe?.kind;
+  const shownName = filename.trim() || probe?.filename || initial.filename || nameFromURL(url) || url;
+  const shownSize = probe ? probe.size : initial.size || -1;
+
   const sourceNote =
     initial.source === "extension" ? t("add.fromExtension") : initial.source === "clipboard" ? t("add.fromClipboard") : "";
+
+  const folderField = (
+    <label className="field">
+      <span>{t("add.folder")}</span>
+      <div className="row">
+        <input
+          value={dir}
+          onChange={(e) => setDir(e.target.value)}
+          placeholder={t("add.folderDefault", { dir: settings?.downloadDir ?? "" })}
+          spellCheck={false}
+          data-testid="add-dir"
+        />
+        <button type="button" className="btn" onClick={browse} data-testid="add-browse">
+          <FolderOpen size={14} /> {t("add.browse")}
+        </button>
+      </div>
+    </label>
+  );
 
   return (
     <Dialog
       title={t("add.title")}
       onClose={onClose}
+      bare={bare}
       testId="add-dialog"
       footer={
         <>
@@ -128,114 +156,137 @@ export function AddDialog({ client, settings, initial, onClose }: Props) {
           void submit(false);
         }}
       >
-        {sourceNote && <p className="source-note">{sourceNote}{initial.pageUrl ? ` · ${initial.pageUrl}` : ""}</p>}
-        <label className="field">
-          <span>{t("add.url")}</span>
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder={t("add.urlPlaceholder")}
-            spellCheck={false}
-            autoFocus
-            data-testid="add-url"
-          />
-        </label>
-
-        <div className="probe-card" aria-live="polite" data-testid="probe">
-          {probing && (
-            <span className="muted">
-              <LoaderCircle size={14} className="spin" /> {t("add.checking")}
-            </span>
-          )}
-          {probe && (
-            <>
-              <CategoryIcon category={probe.category} size={22} />
+        {!more && (
+          <>
+            <div className="quick-file" data-testid="quick-file">
+              <CategoryIcon category={probe?.category ?? "other"} size={30} />
               <div className="probe-info">
-                <strong className="ellipsis" data-testid="probe-name">
-                  {probe.filename} <KindBadge kind={videoPage ? "video" : probe.kind} />
+                <strong className="ellipsis" data-testid="quick-name" title={shownName}>
+                  <bdi>{shownName}</bdi> {kind ? <KindBadge kind={kind} /> : null}
                 </strong>
-                <span className="muted">
-                  <span data-testid="probe-size"><bdi>{probe.size >= 0 ? formatBytes(probe.size) : t("add.unknownSize")}</bdi></span>
-                  {" · "}
-                  <span className={probe.resumable ? "ok" : "warn"}>
-                    {probe.resumable ? t("add.resumable") : t("add.notResumable")}
-                  </span>
+                <span className="muted" data-testid="quick-size">
+                  {probing ? (
+                    <>
+                      <LoaderCircle size={13} className="spin" /> {t("add.checkingSize")}
+                    </>
+                  ) : (
+                    <bdi>{shownSize >= 0 ? formatBytes(shownSize) : t("add.unknownSize")}</bdi>
+                  )}
                 </span>
               </div>
-            </>
-          )}
-          {probeError && <span className="warn">{t("add.probeFailed", { error: probeError })}</span>}
-          {!probing && !probe && !probeError && initial.size ? (
-            <span className="muted"><bdi>{formatBytes(initial.size)}</bdi></span>
-          ) : null}
-        </div>
-        {/^https?:/i.test(url.trim()) && (!probe?.kind || probe.kind === "http" || probe.kind === "video") && (
-          <label className="check" title={t("add.videoPageHint")}>
-            <input
-              type="checkbox"
-              checked={videoPage || probe?.kind === "video"}
-              disabled={probe?.kind === "video"}
-              onChange={(e) => setVideoPage(e.target.checked)}
-              data-testid="add-video-page"
-            />
-            {t("add.videoPage")}
-          </label>
+            </div>
+            {probeError && <p className="warn quick-warn">{t("add.probeFailed", { error: probeError })}</p>}
+          </>
         )}
+        {!more && folderField}
+        {more && (
+          <>
+            {sourceNote && <p className="source-note">{sourceNote}{initial.pageUrl ? ` · ${initial.pageUrl}` : ""}</p>}
+            <label className="field">
+              <span>{t("add.url")}</span>
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder={t("add.urlPlaceholder")}
+                spellCheck={false}
+                autoFocus
+                data-testid="add-url"
+              />
+            </label>
 
-        <label className="field">
-          <span>{t("add.folder")}</span>
-          <div className="row">
-            <input
-              value={dir}
-              onChange={(e) => setDir(e.target.value)}
-              placeholder={t("add.folderDefault", { dir: settings?.downloadDir ?? "" })}
-              spellCheck={false}
-              data-testid="add-dir"
-            />
-            <button type="button" className="btn" onClick={browse} data-testid="add-browse">
-              <FolderOpen size={14} /> {t("add.browse")}
-            </button>
-          </div>
-        </label>
+            <div className="probe-card" aria-live="polite" data-testid="probe">
+              {probing && (
+                <span className="muted">
+                  <LoaderCircle size={14} className="spin" /> {t("add.checking")}
+                </span>
+              )}
+              {probe && (
+                <>
+                  <CategoryIcon category={probe.category} size={22} />
+                  <div className="probe-info">
+                    <strong className="ellipsis" data-testid="probe-name">
+                      {probe.filename} <KindBadge kind={videoPage ? "video" : probe.kind} />
+                    </strong>
+                    <span className="muted">
+                      <span data-testid="probe-size"><bdi>{probe.size >= 0 ? formatBytes(probe.size) : t("add.unknownSize")}</bdi></span>
+                      {" · "}
+                      <span className={probe.resumable ? "ok" : "warn"}>
+                        {probe.resumable ? t("add.resumable") : t("add.notResumable")}
+                      </span>
+                    </span>
+                  </div>
+                </>
+              )}
+              {probeError && <span className="warn">{t("add.probeFailed", { error: probeError })}</span>}
+              {!probing && !probe && !probeError && initial.size ? (
+                <span className="muted"><bdi>{formatBytes(initial.size)}</bdi></span>
+              ) : null}
+            </div>
+            {/^https?:/i.test(url.trim()) && (!probe?.kind || probe.kind === "http" || probe.kind === "video") && (
+              <label className="check" title={t("add.videoPageHint")}>
+                <input
+                  type="checkbox"
+                  checked={videoPage || probe?.kind === "video"}
+                  disabled={probe?.kind === "video"}
+                  onChange={(e) => setVideoPage(e.target.checked)}
+                  data-testid="add-video-page"
+                />
+                {t("add.videoPage")}
+              </label>
+            )}
 
-        <label className="field">
-          <span>{t("add.filename")}</span>
-          <input
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-            placeholder={probe?.filename || t("add.filenamePlaceholder")}
-            spellCheck={false}
-            data-testid="add-filename"
-          />
-        </label>
+            {folderField}
+            <label className="field">
+              <span>{t("add.filename")}</span>
+              <input
+                value={filename}
+                onChange={(e) => setFilename(e.target.value)}
+                placeholder={probe?.filename || t("add.filenamePlaceholder")}
+                spellCheck={false}
+                data-testid="add-filename"
+              />
+            </label>
 
-        <div className="field-row">
-          <label className="field grow">
-            <span>
-              {t("add.connections")}: <strong data-testid="add-conn-value">{connections}</strong>
-            </span>
-            <input
-              type="range"
-              min={1}
-              max={32}
-              value={connections}
-              onChange={(e) => setConnections(Number(e.target.value))}
-              data-testid="add-connections"
-            />
-          </label>
-          <label className="field grow">
-            <span>{t("add.checksum")}</span>
-            <input
-              value={checksum}
-              onChange={(e) => setChecksum(e.target.value)}
-              placeholder={t("add.checksumPlaceholder")}
-              spellCheck={false}
-              className="mono"
-              data-testid="add-checksum"
-            />
-          </label>
-        </div>
+            <div className="field-row">
+              <label className="field grow">
+                <span>
+                  {t("add.connections")}: <strong data-testid="add-conn-value">{connections}</strong>
+                </span>
+                <input
+                  type="range"
+                  min={1}
+                  max={32}
+                  value={connections}
+                  onChange={(e) => setConnections(Number(e.target.value))}
+                  data-testid="add-connections"
+                />
+              </label>
+              <label className="field grow">
+                <span>{t("add.checksum")}</span>
+                <input
+                  value={checksum}
+                  onChange={(e) => setChecksum(e.target.value)}
+                  placeholder={t("add.checksumPlaceholder")}
+                  spellCheck={false}
+                  className="mono"
+                  data-testid="add-checksum"
+                />
+              </label>
+            </div>
+          </>
+        )}
+        {startsCompact(initial) && (
+          <button
+            type="button"
+            className="more-toggle"
+            aria-expanded={more}
+            onClick={() => setMore((m) => !m)}
+            data-testid="add-more"
+          >
+            <ChevronDown size={14} className={more ? "flip" : undefined} /> {t(more ? "add.fewerDetails" : "add.moreDetails")}
+          </button>
+        )}
         {error && (
           <p className="form-error" role="alert">
             {error}

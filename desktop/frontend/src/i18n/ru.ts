@@ -112,6 +112,9 @@ export const ru: Strings = {
   "add.fromExtension": "Передано из браузера",
   "add.fromClipboard": "Скопированная ссылка",
   "add.invalidUrl": "Введите ссылку http:// или https://",
+  "add.moreDetails": "Подробнее",
+  "add.fewerDetails": "Скрыть подробности",
+  "add.checkingSize": "Определяем размер…",
 
   "batch.title": "Пакетное добавление",
   "batch.hint": "Вставьте по одной ссылке в строке. Шаблоны вида file[001-100].zip разворачиваются во множество ссылок.",

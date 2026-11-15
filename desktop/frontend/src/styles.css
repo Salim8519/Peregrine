@@ -1770,3 +1770,61 @@ tr.selected .cat-icon {
 .kind-video { color: var(--err); border-color: color-mix(in srgb, var(--err) 45%, transparent); }
 .kind-hls, .kind-dash { color: var(--accent-text); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
 .kind-ftp { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+
+/* ---------- quick add (short form + popup window, ADR 0021) ---------- */
+.quick-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--field);
+  border: 1px solid var(--line-soft);
+}
+.quick-file strong {
+  font-size: 15px;
+}
+.quick-file .muted {
+  font-variant-numeric: tabular-nums;
+}
+.quick-warn {
+  margin: 0;
+  font-size: 13px;
+}
+.more-toggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+}
+.more-toggle:hover {
+  text-decoration: underline;
+}
+.more-toggle .flip {
+  transform: rotate(180deg);
+}
+.popup-root {
+  height: 100vh;
+  overflow: auto;
+  background: var(--raised);
+}
+.dialog.bare {
+  width: 100%;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+}
+.dialog.bare .dialog-close {
+  display: none; /* the window's own close button cancels */
+}
+.dialog.bare .dialog-body {
+  overflow: visible;
+}

@@ -15,5 +15,7 @@
   "action.sleep": "スリープします",
   "action.shutdown": "シャットダウンします",
   "updateAvailable": "Peregrine {version} が利用可能です",
-  "updateBody": "Peregrine を開いて新しいバージョンをダウンロードしてください。"
+  "updateBody": "Peregrine を開いて新しいバージョンをダウンロードしてください。",
+  "openFile": "ファイルを開く",
+  "openFolder": "フォルダーに表示"
 }

@@ -112,6 +112,9 @@ export const id: Strings = {
   "add.fromExtension": "Dikirim oleh browser Anda",
   "add.fromClipboard": "Tautan yang disalin",
   "add.invalidUrl": "Masukkan tautan http:// atau https://",
+  "add.moreDetails": "Detail lainnya",
+  "add.fewerDetails": "Lebih sedikit detail",
+  "add.checkingSize": "Memeriksa ukuran…",
 
   "batch.title": "Tambah massal",
   "batch.hint": "Tempel satu tautan per baris. Pola seperti file[001-100].zip akan diperluas menjadi banyak tautan.",

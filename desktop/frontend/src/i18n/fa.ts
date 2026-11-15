@@ -111,6 +111,9 @@ export const fa: Strings = {
   "add.fromExtension": "پیشنهاد‌شده از مرورگر شما",
   "add.fromClipboard": "پیوند کپی‌شده",
   "add.invalidUrl": "یک پیوند http:// یا https:// وارد کنید",
+  "add.moreDetails": "جزئیات بیشتر",
+  "add.fewerDetails": "جزئیات کمتر",
+  "add.checkingSize": "در حال بررسی حجم…",
 
   "batch.title": "افزودن گروهی",
   "batch.hint": "در هر خط یک پیوند جای‌گذاری کنید. الگوهایی مانند file[001-100].zip به چندین پیوند تبدیل می‌شوند.",

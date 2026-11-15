@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.0] - 2026-11-15
+
+### Added
+- Quick add: a download from the browser opens a small window with just the file name,
+  size and folder, instead of the whole app. "More details" shows the rest (address, file
+  name, connections, checksum). Start or Cancel and the window goes back to the tray. If the
+  app is already open, the same short form opens inside it.
+- The "Download complete" notification has Open file and Show in folder buttons.
+
+### Fixed
+- A second download offered while the add dialog was open kept the first link's details.
+
 ## [0.4.3] - 2026-11-14
 
 ### Fixed

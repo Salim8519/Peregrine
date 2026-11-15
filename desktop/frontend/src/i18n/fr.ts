@@ -112,6 +112,9 @@ export const fr: Strings = {
   "add.fromExtension": "Proposé par votre navigateur",
   "add.fromClipboard": "Lien copié",
   "add.invalidUrl": "Saisissez un lien http:// ou https://",
+  "add.moreDetails": "Plus de détails",
+  "add.fewerDetails": "Moins de détails",
+  "add.checkingSize": "Vérification de la taille…",
 
   "batch.title": "Ajout groupé",
   "batch.hint": "Collez un lien par ligne. Les motifs comme file[001-100].zip sont développés en plusieurs liens.",

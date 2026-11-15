@@ -8,11 +8,13 @@ interface Props {
   children: ReactNode;
   footer?: ReactNode;
   wide?: boolean;
+  /** No overlay: the dialog fills the window (quick-add popup). */
+  bare?: boolean;
   testId?: string;
 }
 
 /** Modal dialog: role=dialog, Escape closes, focus moves inside and is restored on close. */
-export function Dialog({ title, onClose, children, footer, wide, testId }: Props) {
+export function Dialog({ title, onClose, children, footer, wide, bare, testId }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const { t } = useI18n();
@@ -46,11 +48,10 @@ export function Dialog({ title, onClose, children, footer, wide, testId }: Props
     }
   };
 
-  return (
-    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+  const box = (
       <div
         ref={ref}
-        className={`dialog${wide ? " wide" : ""}`}
+        className={`dialog${wide ? " wide" : ""}${bare ? " bare" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -66,6 +67,11 @@ export function Dialog({ title, onClose, children, footer, wide, testId }: Props
         <div className="dialog-body">{children}</div>
         {footer && <footer className="dialog-foot">{footer}</footer>}
       </div>
+  );
+  if (bare) return box;
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      {box}
     </div>
   );
 }

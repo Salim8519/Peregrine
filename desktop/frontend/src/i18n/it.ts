@@ -112,6 +112,9 @@ export const it: Strings = {
   "add.fromExtension": "Proposto dal browser",
   "add.fromClipboard": "Link copiato",
   "add.invalidUrl": "Inserisci un link http:// o https://",
+  "add.moreDetails": "Più dettagli",
+  "add.fewerDetails": "Meno dettagli",
+  "add.checkingSize": "Verifica dimensione…",
 
   "batch.title": "Aggiunta multipla",
   "batch.hint": "Incolla un link per riga. Modelli come file[001-100].zip vengono espansi in molti link.",

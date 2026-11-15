@@ -15,5 +15,7 @@
   "action.sleep": "Переход в спящий режим",
   "action.shutdown": "Выключение компьютера",
   "updateAvailable": "Доступна версия Peregrine {version}",
-  "updateBody": "Откройте Peregrine, чтобы скачать новую версию."
+  "updateBody": "Откройте Peregrine, чтобы скачать новую версию.",
+  "openFile": "Открыть файл",
+  "openFolder": "Показать в папке"
 }

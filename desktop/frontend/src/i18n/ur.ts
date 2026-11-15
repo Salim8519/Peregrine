@@ -111,6 +111,9 @@ export const ur: Strings = {
   "add.fromExtension": "آپ کے براؤزر کی جانب سے",
   "add.fromClipboard": "کاپی شدہ لنک",
   "add.invalidUrl": "http:// یا https:// والا لنک درج کریں",
+  "add.moreDetails": "مزید تفصیلات",
+  "add.fewerDetails": "کم تفصیلات",
+  "add.checkingSize": "سائز معلوم کیا جا رہا ہے…",
 
   "batch.title": "بیچ میں شامل کریں",
   "batch.hint": "ہر سطر میں ایک لنک پیسٹ کریں۔ file[001-100].zip جیسے پیٹرن کئی لنکس میں بدل جاتے ہیں۔",
