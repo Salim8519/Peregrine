@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.4] - 2026-11-16
+
+### Fixed
+- Windows: "Open" on a finished download did nothing for some files (for example when
+  the folder or file name has spaces and "&"); only "Show in folder" worked. Peregrine
+  now opens files the same way a double-click in Explorer does.
+
 ## [0.5.3] - 2026-11-15
 
 ### Fixed
