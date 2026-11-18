@@ -4,6 +4,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.5] - 2026-11-18
+
 ### Added
 - The add dialog (also the small popup) has three "When done" choices on one line:
   📄 Open file, 📂 Open folder (both off each time) and 🔔 Show popup (on by default; if you
