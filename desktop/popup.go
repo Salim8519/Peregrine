@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/Salim8519/Peregrine/engine"
 	"github.com/Salim8519/Peregrine/internal/api"
 	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -12,7 +13,8 @@ import (
 // in the tray, minimised, or (Windows) open behind the browser shows only a small add
 // dialog, not the whole app. Wails v2 has
 // one window, so the popup is that window shrunk, centred and kept on top; finishing the
-// dialog puts it back the way it was and hides it again.
+// dialog puts it back the way it was and hides it again. The same popup shows the
+// "download complete" dialog (ADR 0023).
 
 const (
 	popupWidth  = 520
@@ -61,10 +63,19 @@ type popup struct {
 	prevH  int
 	prevX  int
 	prevY  int
+	kind   popupKind // what the popup shows
 	// pending is the link the popup is showing, for a UI that loads after the capture
 	// event went out (a link arriving right after start).
 	pending *api.Capture
 }
+
+// popupKind is what the popup shows.
+type popupKind int
+
+const (
+	kindAdd  popupKind = iota // the quick-add dialog for a captured link
+	kindDone                  // "download complete" (ADR 0023)
+)
 
 // popupFrom is the window's state before the popup, where closing it puts it back.
 type popupFrom int
@@ -80,9 +91,20 @@ const (
 // window can be put back behind without taking the focus). It returns false (and does
 // nothing) when the user is in the app: then the dialog opens inside it.
 func (p *popup) open(w window, hidden, focused bool) bool {
+	return p.openAs(w, kindAdd, hidden, focused)
+}
+
+// openAs is open for a given kind. A "download complete" popup never replaces a quick-add
+// popup that is up (a link is waiting for the user); a captured link replaces a "download
+// complete" popup.
+func (p *popup) openAs(w window, kind popupKind, hidden, focused bool) bool {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.active {
+		if kind == kindDone && p.kind == kindAdd {
+			return false
+		}
+		p.kind = kind
 		w.show() // another capture while the popup is up: just bring it forward
 		return true
 	}
@@ -100,6 +122,7 @@ func (p *popup) open(w window, hidden, focused bool) bool {
 		w.rememberFront()
 	}
 	p.active = true
+	p.kind = kind
 	p.from = from
 	p.wasMax = w.isMaximised()
 	if p.wasMax {
@@ -191,6 +214,13 @@ func (p *popup) pendingCapture() *api.Capture {
 	return p.pending
 }
 
+// shows reports whether the popup is up and showing kind.
+func (p *popup) shows(kind popupKind) bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.active && p.kind == kind
+}
+
 func (p *popup) isActive() bool {
 	p.mu.Lock()
 	defer p.mu.Unlock()
@@ -241,6 +271,32 @@ func (a *App) showForCapture() {
 	a.life.mu.Lock()
 	a.life.setHiddenLocked(false)
 	a.life.mu.Unlock()
+}
+
+// showDone shows the "download complete" dialog for d (ADR 0023): as the popup when the
+// user is not looking at the app, inside the app when they are. It returns false when the
+// dialog could not be shown (a quick-add popup is up, or the window is behind another app
+// where it cannot be popped up); the caller then falls back to the system notification.
+func (a *App) showDone(d engine.Download) bool {
+	if a.ctx == nil {
+		return false
+	}
+	a.life.mu.Lock()
+	hidden, focused := a.life.hidden, a.life.focused
+	a.life.mu.Unlock()
+	if a.pop.shows(kindAdd) {
+		return false
+	}
+	// The UI shows the dialog on this event, in the popup or in the app. Sent before the
+	// popup opens, so the popup never shows empty.
+	wruntime.EventsEmit(a.ctx, "peregrine:done", d)
+	if a.pop.openAs(wailsWindow{a.ctx}, kindDone, hidden, focused) {
+		a.life.mu.Lock()
+		a.life.setHiddenLocked(false)
+		a.life.mu.Unlock()
+		return true
+	}
+	return focused && !hidden // in the app: the dialog is on screen
 }
 
 // PopupDone is called by the UI when the quick-add dialog closes (added or cancelled).

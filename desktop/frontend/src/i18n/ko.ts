@@ -242,4 +242,10 @@ export const ko: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "동영상 페이지입니다 — 동영상 다운로드",
   "add.videoPageHint": "Peregrine이 자동으로 인식하지 못하는 YouTube 등 동영상 사이트용입니다.",
+  "add.whenDone": "완료되면",
+  "add.showPopup": "팝업 표시",
+  "done.openFile": "파일 열기",
+  "done.openFolder": "폴더 열기",
+  "done.close": "닫기",
+  "settings.donePopup": "다운로드가 완료되면 팝업 창 표시",
 };

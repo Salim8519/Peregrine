@@ -242,4 +242,10 @@ export const ar: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "هذه صفحة فيديو — نزّل الفيديو منها",
   "add.videoPageHint": "لمواقع يوتيوب وغيرها التي لا يتعرّف عليها Peregrine تلقائيًا.",
+  "add.whenDone": "عند الانتهاء",
+  "add.showPopup": "إظهار نافذة",
+  "done.openFile": "فتح الملف",
+  "done.openFolder": "فتح المجلد",
+  "done.close": "إغلاق",
+  "settings.donePopup": "إظهار نافذة صغيرة عند اكتمال التنزيل",
 };

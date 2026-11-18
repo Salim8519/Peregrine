@@ -242,4 +242,10 @@ export const tr: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "Bu bir video sayfası — videosunu indir",
   "add.videoPageHint": "Peregrine'in otomatik tanımadığı YouTube ve diğer video siteleri için.",
+  "add.whenDone": "Bitince",
+  "add.showPopup": "Pencere göster",
+  "done.openFile": "Dosyayı aç",
+  "done.openFolder": "Klasörü aç",
+  "done.close": "Kapat",
+  "settings.donePopup": "Bir indirme bittiğinde pencere göster",
 };

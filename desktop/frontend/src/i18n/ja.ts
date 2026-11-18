@@ -242,4 +242,10 @@ export const ja: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "動画ページとして扱い、動画をダウンロードする",
   "add.videoPageHint": "Peregrine が自動で認識しない YouTube などの動画サイト向けです。",
+  "add.whenDone": "完了時",
+  "add.showPopup": "ポップアップを表示",
+  "done.openFile": "ファイルを開く",
+  "done.openFolder": "フォルダーを開く",
+  "done.close": "閉じる",
+  "settings.donePopup": "ダウンロードが完了したらポップアップを表示する",
 };

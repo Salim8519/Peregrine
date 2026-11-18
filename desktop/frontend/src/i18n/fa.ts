@@ -241,4 +241,10 @@ export const fa: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "این صفحهٔ ویدیو است — ویدیوی آن دانلود شود",
   "add.videoPageHint": "برای یوتیوب و سایت‌های ویدیویی دیگری که Peregrine خودکار تشخیص نمی‌دهد.",
+  "add.whenDone": "پس از پایان",
+  "add.showPopup": "نمایش پنجره",
+  "done.openFile": "باز کردن فایل",
+  "done.openFolder": "باز کردن پوشه",
+  "done.close": "بستن",
+  "settings.donePopup": "نمایش یک پنجره هنگام پایان دانلود",
 };

@@ -355,6 +355,15 @@ export function SettingsDialog({ client, settings, version, update, onClose, onS
           <label className="check">
             <input
               type="checkbox"
+              checked={s.donePopup}
+              onChange={(e) => set("donePopup", e.target.checked)}
+              data-testid="set-donePopup"
+            />
+            {t("settings.donePopup")}
+          </label>
+          <label className="check">
+            <input
+              type="checkbox"
               checked={s.updateCheck}
               onChange={(e) => set("updateCheck", e.target.checked)}
               data-testid="set-updateCheck"

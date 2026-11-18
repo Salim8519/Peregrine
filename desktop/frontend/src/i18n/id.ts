@@ -242,4 +242,10 @@ export const id: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "Ini halaman video — unduh videonya",
   "add.videoPageHint": "Untuk YouTube dan situs video lain yang tidak dikenali Peregrine secara otomatis.",
+  "add.whenDone": "Setelah selesai",
+  "add.showPopup": "Tampilkan jendela",
+  "done.openFile": "Buka file",
+  "done.openFolder": "Buka folder",
+  "done.close": "Tutup",
+  "settings.donePopup": "Tampilkan jendela saat unduhan selesai",
 };

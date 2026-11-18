@@ -421,6 +421,7 @@ func (m *Manager) Add(r Request) (Download, error) {
 		ETA:         -1,
 		AutoName:    r.Filename == "",
 		AutoDir:     r.Dir == "",
+		AfterDone:   r.AfterDone,
 	}
 	if kind != KindHTTP {
 		d.Kind = kind

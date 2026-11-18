@@ -242,4 +242,10 @@ export const ru: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "Это страница с видео — скачать видео",
   "add.videoPageHint": "Для YouTube и других видеосайтов, которые Peregrine не распознаёт автоматически.",
+  "add.whenDone": "По завершении",
+  "add.showPopup": "Показать окно",
+  "done.openFile": "Открыть файл",
+  "done.openFolder": "Открыть папку",
+  "done.close": "Закрыть",
+  "settings.donePopup": "Показывать окно по завершении загрузки",
 };

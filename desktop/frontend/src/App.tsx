@@ -38,7 +38,7 @@ import {
 } from "./lib/download";
 import { looksDownloadable, parseBatch } from "./lib/batch";
 import { formatSpeed, nextSpeedHistory } from "./lib/format";
-import { cancelPowerAction, onPopup, onPower, popupActive, popupDone, popupFit, popupPending, PowerEvent, setFocused } from "./lib/desktop";
+import { cancelPowerAction, onDone, onPopup, onPower, popupActive, popupDone, popupFit, popupPending, PowerEvent, setFocused } from "./lib/desktop";
 import { PowerDialog, ScheduleBadge } from "./components/Schedule";
 
 /** Keeps a number+unit like "4.6 MB/s" in order inside Arabic sentences (Unicode LRI ... PDI). */
@@ -49,6 +49,7 @@ import { DownloadTable } from "./components/DownloadTable";
 import { DetailPanel } from "./components/DetailPanel";
 import { ContextMenu, MenuItem } from "./components/ContextMenu";
 import { AddDialog, AddInitial } from "./components/AddDialog";
+import { DoneDialog } from "./components/DoneDialog";
 import { BatchDialog } from "./components/BatchDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { ConnectBrowserDialog } from "./components/ConnectBrowserDialog";
@@ -58,6 +59,7 @@ import logo from "./logo.svg";
 
 type Modal =
   | { type: "add"; initial: AddInitial }
+  | { type: "done"; download: Download }
   | { type: "batch"; text?: string }
   | { type: "settings" }
   | { type: "browser" }
@@ -139,9 +141,15 @@ export default function App() {
     return onPopup((mode) => {
       setPopup(mode === "open");
       // Back in the tray (popup closed from its title bar): drop the half-filled dialog.
-      if (mode === "closed") setModal((m) => (m?.type === "add" ? null : m));
+      if (mode === "closed") setModal((m) => (m?.type === "add" || m?.type === "done" ? null : m));
     });
   }, []);
+  // "Download complete" dialog (ADR 0023): in the popup, or in the app when nothing else is
+  // open. A newer finished download replaces an older one; a waiting add dialog is kept.
+  useEffect(
+    () => onDone((d) => setModal((m) => (m === null || m.type === "done" ? { type: "done", download: d } : m))),
+    [],
+  );
   const popupRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!popup) return;
@@ -155,7 +163,7 @@ export default function App() {
   }, [popup, modal]);
   // A popup without a captured link to show (should not happen): don't leave it empty.
   useEffect(() => {
-    if (!popup || modal?.type === "add") return;
+    if (!popup || modal?.type === "add" || modal?.type === "done") return;
     const id = window.setTimeout(() => {
       void popupPending().then((c) => (c ? setModal({ type: "add", initial: c }) : popupDone(false)));
     }, 3000);
@@ -452,6 +460,13 @@ export default function App() {
   const modalDownload = modal && (modal.type === "refresh" || modal.type === "limit") ? downloads.get(modal.id) : undefined;
   const t = tr;
 
+  // Closes the "download complete" dialog (and its popup), then opens the file or folder.
+  const finishDone = (open?: () => Promise<unknown>) => {
+    setModal(null);
+    if (popup) popupDone(false);
+    if (open) void run(open);
+  };
+
   if (popup) {
     return (
       <I18nProvider lang={lang}>
@@ -467,6 +482,16 @@ export default function App() {
                 setModal(null);
                 popupDone(false);
               }}
+            />
+          )}
+          {modal?.type === "done" && (
+            <DoneDialog
+              key={modal.download.id}
+              d={modal.download}
+              bare
+              onOpenFile={() => finishDone(() => api.openFile(modal.download.id))}
+              onOpenFolder={() => finishDone(() => api.showInFolder(modal.download.id))}
+              onClose={() => finishDone()}
             />
           )}
         </div>
@@ -663,6 +688,15 @@ export default function App() {
         )}
 
         {modal?.type === "add" && <AddDialog key={modal.initial.url} client={api} settings={settings} initial={modal.initial} onClose={() => setModal(null)} />}
+        {modal?.type === "done" && (
+          <DoneDialog
+            key={modal.download.id}
+            d={modal.download}
+            onOpenFile={() => finishDone(() => api.openFile(modal.download.id))}
+            onOpenFolder={() => finishDone(() => api.showInFolder(modal.download.id))}
+            onClose={() => finishDone()}
+          />
+        )}
         {modal?.type === "batch" && (
           <BatchDialog
             client={api}

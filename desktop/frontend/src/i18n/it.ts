@@ -242,4 +242,10 @@ export const it: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "È una pagina video: scarica il video",
   "add.videoPageHint": "Per YouTube e altri siti video che Peregrine non riconosce automaticamente.",
+  "add.whenDone": "Al termine",
+  "add.showPopup": "Mostra finestra",
+  "done.openFile": "Apri file",
+  "done.openFolder": "Apri cartella",
+  "done.close": "Chiudi",
+  "settings.donePopup": "Mostra una finestra quando un download termina",
 };

@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+### Added
+- The add dialog (also the small popup) has three "When done" choices on one line:
+  📄 Open file, 📂 Open folder (both off each time) and 🔔 Show popup (on by default; if you
+  turn it off, Peregrine remembers it, and it is also in Settings).
+- "Download complete" popup: a small window like the add popup, with the file name, size and
+  folder, and Open file / Open folder / Close buttons. It replaces the notification for that
+  download.
+
+### Changed
+- The Start now and Add paused buttons show ⬇️ and ⏸️.
+
 ## [0.5.4] - 2026-11-16
 
 ### Fixed

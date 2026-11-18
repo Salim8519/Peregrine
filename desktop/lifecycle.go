@@ -221,7 +221,7 @@ func (l *life) downloadChanged(d engine.Download) {
 	}
 	switch d.Status {
 	case engine.StatusCompleted:
-		l.notifyDone(d)
+		l.finished(d)
 	case engine.StatusError:
 		l.notify("err-"+d.ID, func(s uiStrings) string { return s.get("failed") }, d.Filename+"\n"+d.Error)
 	}

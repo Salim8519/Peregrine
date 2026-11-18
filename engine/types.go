@@ -48,6 +48,18 @@ type Request struct {
 	// Kind forces a downloader ("http", "ftp", "hls", "dash", "video", "torrent"); empty =
 	// detect from the URL (see Protocol.Match).
 	Kind string `json:"kind,omitempty"`
+	// AfterDone is what the desktop app does when the download finishes (ADR 0023).
+	AfterDone AfterDone `json:"afterDone,omitzero"`
+}
+
+// AfterDone is what the desktop app does when a download finishes. The engine only
+// stores it with the download; the app's add dialog sets it. The browser extension cannot
+// (the native messaging host never forwards it), so a web page can never make a
+// downloaded file open itself.
+type AfterDone struct {
+	OpenFile   bool `json:"openFile,omitempty"`   // open the file with its default app
+	OpenFolder bool `json:"openFolder,omitempty"` // show the file in its folder
+	Popup      bool `json:"popup,omitempty"`      // show the "download complete" popup
 }
 
 // Download is a snapshot of one download's state, safe to serialize to the UI.
@@ -81,6 +93,7 @@ type Download struct {
 	Kind        string            `json:"kind,omitempty"`     // downloader; "" = http
 	ProtoState  json.RawMessage   `json:"protoState,omitempty"`
 	IsDir       bool              `json:"isDir,omitempty"` // output is a folder (multi-file torrent)
+	AfterDone   AfterDone         `json:"afterDone,omitzero"`
 }
 
 // Path returns the final path of the file.
@@ -117,6 +130,8 @@ type Settings struct {
 	LaunchAtLogin bool `json:"launchAtLogin"` // start (hidden) when the user signs in
 	Notify        bool `json:"notify"`        // system notifications for finished/failed downloads
 	UpdateCheck   bool `json:"updateCheck"`   // check GitHub for a newer release (ADR 0020)
+	// DonePopup is the add dialog's last choice for "show a popup when done" (ADR 0023).
+	DonePopup bool `json:"donePopup"`
 
 	// UIVersion records which one-time settings migrations have run (see migrateSettings).
 	UIVersion int `json:"uiVersion"`
@@ -154,6 +169,7 @@ func DefaultSettings() Settings {
 		CloseToTray: true,
 		Notify:      true,
 		UpdateCheck: true,
+		DonePopup:   true,
 	}
 }
 

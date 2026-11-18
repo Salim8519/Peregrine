@@ -211,3 +211,31 @@ func TestPopupNotUsedWhenUserInApp(t *testing.T) {
 		t.Fatal("popup opened while the user was in the app")
 	}
 }
+
+// ADR 0023: the "download complete" popup uses the same window. It never replaces a
+// quick-add popup that is waiting for the user; a captured link replaces it.
+func TestDonePopupAndQuickAdd(t *testing.T) {
+	var p popup
+	w := &fakeWindow{w: 1100, h: 700}
+	if !p.openAs(w, kindDone, true, true) || !p.shows(kindDone) {
+		t.Fatal("done popup did not open from the tray")
+	}
+	if !p.openAs(w, kindDone, true, true) {
+		t.Fatal("a second finished download did not reuse the done popup")
+	}
+	if !p.open(w, true, true) || !p.shows(kindAdd) {
+		t.Fatal("a captured link did not take over the done popup")
+	}
+	if p.openAs(w, kindDone, true, true) || !p.shows(kindAdd) {
+		t.Fatal("a finished download replaced the quick-add popup")
+	}
+	p.close(w, false)
+	if p.isActive() || w.w != 1100 || w.h != 700 {
+		t.Fatalf("window not restored: %+v", w)
+	}
+	// In the app: no popup (the dialog shows inside the app).
+	w = &fakeWindow{visible: true, w: 1100, h: 700}
+	if p.openAs(w, kindDone, false, true) {
+		t.Fatal("done popup opened while the user is in the app")
+	}
+}

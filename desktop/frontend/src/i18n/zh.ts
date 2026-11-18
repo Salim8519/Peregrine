@@ -242,4 +242,10 @@ export const zh: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "这是视频页面——下载其中的视频",
   "add.videoPageHint": "适用于 Peregrine 无法自动识别的 YouTube 等视频网站。",
+  "add.whenDone": "完成后",
+  "add.showPopup": "显示弹窗",
+  "done.openFile": "打开文件",
+  "done.openFolder": "打开文件夹",
+  "done.close": "关闭",
+  "settings.donePopup": "下载完成时显示弹窗",
 };

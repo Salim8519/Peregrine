@@ -23,6 +23,7 @@ export interface Download {
   speed: number;
   kind?: DownloadKind;
   isDir?: boolean; // output is a folder (multi-file torrent)
+  afterDone?: AfterDone;
   eta: number; // seconds, -1 unknown
   checksum?: string;
   sha256?: string;
@@ -44,6 +45,14 @@ export interface AddRequest {
   speedLimit?: number;
   paused?: boolean;
   kind?: DownloadKind;
+  afterDone?: AfterDone;
+}
+
+/** What the desktop app does when the download finishes (ADR 0023). */
+export interface AfterDone {
+  openFile?: boolean;
+  openFolder?: boolean;
+  popup?: boolean;
 }
 
 /** Which downloader handles a link ("" or "http" = the built-in segmented HTTP engine). */
@@ -78,6 +87,7 @@ export interface Settings {
   launchAtLogin: boolean;
   notify: boolean;
   updateCheck: boolean;
+  donePopup: boolean; // last choice of "show a popup when done" in the add dialog
 }
 
 export type WhenDone = "none" | "quit" | "sleep" | "shutdown";

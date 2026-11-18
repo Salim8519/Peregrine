@@ -548,3 +548,33 @@ test("every setting is saved, shown again and takes effect", async ({ app, info 
     closeToTray: true,
   });
 });
+
+test("add dialog: when-done choices are stored, the popup choice is remembered", async ({ app, info }) => {
+  await rpc(app, "updateSettings", { donePopup: true });
+  await app.reload();
+  const name = "e2e-when-done.bin";
+  await app.getByTestId("tb-add").click();
+  const dlg = app.getByTestId("add-dialog");
+  await dlg.getByTestId("add-url").fill(`${info.files}/file?size=1000&name=${name}`);
+  await expect(dlg.getByTestId("probe-name")).toContainText(name);
+  // Opening the file or folder starts off; the popup starts on.
+  await expect(dlg.getByTestId("add-open-file")).not.toBeChecked();
+  await expect(dlg.getByTestId("add-open-folder")).not.toBeChecked();
+  await expect(dlg.getByTestId("add-done-popup")).toBeChecked();
+  await dlg.getByTestId("add-open-folder").check();
+  await dlg.getByTestId("add-done-popup").uncheck();
+  await dlg.getByTestId("add-paused").click();
+  await expect(dlg).toBeHidden();
+
+  const list = await rpc<{ filename: string; afterDone?: { openFile?: boolean; openFolder?: boolean; popup?: boolean } }[]>(app, "list");
+  const d = list.find((x) => x.filename === name);
+  expect(d?.afterDone).toEqual({ openFolder: true });
+  await expect.poll(async () => (await rpc<{ donePopup: boolean }>(app, "getSettings")).donePopup).toBe(false);
+
+  // Next time: the popup choice is remembered, opening the file still starts off.
+  await app.getByTestId("tb-add").click();
+  await expect(dlg.getByTestId("add-done-popup")).not.toBeChecked();
+  await expect(dlg.getByTestId("add-open-folder")).not.toBeChecked();
+  await dlg.getByRole("button", { name: "Cancel" }).first().click();
+  await rpc(app, "updateSettings", { donePopup: true });
+});

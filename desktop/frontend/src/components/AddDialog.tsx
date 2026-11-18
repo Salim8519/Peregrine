@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, FolderOpen, LoaderCircle, Play, Plus } from "lucide-react";
+import { ChevronDown, FolderOpen, LoaderCircle } from "lucide-react";
 import { Dialog } from "./Dialog";
 import { CategoryIcon } from "./FileIcon";
 import { useI18n } from "../i18n";
@@ -35,6 +35,11 @@ export function AddDialog({ client, settings, initial, onClose, bare }: Props) {
   const [probeError, setProbeError] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  // When done (ADR 0023): opening the file or folder starts off every time; the popup
+  // starts from the last choice, which is remembered in the settings.
+  const [openFile, setOpenFile] = useState(false);
+  const [openFolder, setOpenFolder] = useState(false);
+  const [donePopup, setDonePopup] = useState(settings?.donePopup ?? true);
   // A captured link opens the short form (name, folder, size); the rest is one click away.
   const [more, setMore] = useState(() => !startsCompact(initial));
   const seq = useRef(0);
@@ -96,7 +101,12 @@ export function AddDialog({ client, settings, initial, onClose, bare }: Props) {
         headers,
         paused,
         kind: videoPage ? "video" : (initial.kind as DownloadKind | undefined) || undefined,
+        afterDone: { openFile, openFolder, popup: donePopup },
       });
+      if (settings && donePopup !== settings.donePopup) {
+        // Remember the popup choice for the next download; the download is already added.
+        client.updateSettings({ donePopup }).catch(() => undefined);
+      }
       onClose();
     } catch (err) {
       setError((err as Error).message);
@@ -141,10 +151,10 @@ export function AddDialog({ client, settings, initial, onClose, bare }: Props) {
             {t("add.cancel")}
           </button>
           <button className="btn" onClick={() => submit(true)} disabled={busy} data-testid="add-paused">
-            <Plus size={14} /> {t("add.addPaused")}
+            <span className="emoji" aria-hidden="true">⏸️</span> {t("add.addPaused")}
           </button>
           <button className="btn primary" onClick={() => submit(false)} disabled={busy} data-testid="add-start">
-            <Play size={14} /> {t("add.startNow")}
+            <span className="emoji" aria-hidden="true">⬇️</span> {t("add.startNow")}
           </button>
         </>
       }
@@ -276,6 +286,21 @@ export function AddDialog({ client, settings, initial, onClose, bare }: Props) {
             </div>
           </>
         )}
+        <fieldset className="when-done" data-testid="when-done">
+          <legend>{t("add.whenDone")}</legend>
+          <label className="check">
+            <input type="checkbox" checked={openFile} onChange={(e) => setOpenFile(e.target.checked)} data-testid="add-open-file" />
+            <span className="emoji" aria-hidden="true">📄</span> {t("done.openFile")}
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={openFolder} onChange={(e) => setOpenFolder(e.target.checked)} data-testid="add-open-folder" />
+            <span className="emoji" aria-hidden="true">📂</span> {t("done.openFolder")}
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={donePopup} onChange={(e) => setDonePopup(e.target.checked)} data-testid="add-done-popup" />
+            <span className="emoji" aria-hidden="true">🔔</span> {t("add.showPopup")}
+          </label>
+        </fieldset>
         {startsCompact(initial) && (
           <button
             type="button"

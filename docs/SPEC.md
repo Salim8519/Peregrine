@@ -89,6 +89,9 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
   "More details" for the rest. While the app is in the tray, minimised, or (Windows) open behind
   another window, it opens as a
   small popup window instead of the whole app (ADR 0021).
+  "When done" choices on one line: open the file, open the folder (both off every time) and
+  show a "download complete" popup (remembered, default on). The popup is the same small
+  window, with Open file / Open folder / Close (ADR 0023).
 - Batch add: paste many links; pattern links (`file[001-100].zip`).
 - Clipboard monitor (opt-in): a copied downloadable link opens the add dialog. This is the
   capture method for browsers without our extension (e.g. Safari, Firefox in v1).

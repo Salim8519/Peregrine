@@ -2,7 +2,7 @@
  * Desktop-only bindings outside the RPC API: window focus (for system notifications), the
  * scheduler's when-done countdown, and the platform. All are no-ops in browser mode.
  */
-import { Capture, WhenDone } from "./types";
+import { Capture, Download, WhenDone } from "./types";
 
 export interface PowerEvent {
   action: WhenDone | "";
@@ -97,4 +97,10 @@ export function popupFit(contentH: number): void {
   void w()
     .go?.main?.App?.PopupFit?.(Math.ceil(contentH), window.innerHeight)
     ?.catch(() => undefined);
+}
+
+/** A download finished and asked for the "download complete" dialog (ADR 0023). */
+export function onDone(fn: (d: Download) => void): () => void {
+  const off = w().runtime?.EventsOn("peregrine:done", (d) => fn(d as Download));
+  return () => off?.();
 }

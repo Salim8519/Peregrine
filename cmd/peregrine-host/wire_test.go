@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
@@ -47,6 +48,31 @@ func TestWireTypesMatchApp(t *testing.T) {
 			} else if got != typ {
 				t.Errorf("%s: field %q is %v in the host but %v in the app", c.name, name, typ, got)
 			}
+		}
+	}
+}
+
+// The browser can never ask for a downloaded file to be opened when it finishes (ADR 0023):
+// "afterDone" is not part of the host's types, so it is dropped from add and capture.
+func TestHostDropsAfterDone(t *testing.T) {
+	for _, typ := range []reflect.Type{reflect.TypeOf(wireRequest{}), reflect.TypeOf(wireCapture{})} {
+		if _, ok := jsonFields(typ)["afterDone"]; ok {
+			t.Errorf("%v forwards afterDone", typ)
+		}
+	}
+	params := []byte(`{"url":"https://x.test/f.exe","afterDone":{"openFile":true}}`)
+	r, err := sanitizeRequest(params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := sanitizeCapture(params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, v := range []any{r, c} {
+		b, _ := json.Marshal(v)
+		if strings.Contains(string(b), "afterDone") || strings.Contains(string(b), "openFile") {
+			t.Errorf("forwarded: %s", b)
 		}
 	}
 }

@@ -241,4 +241,10 @@ export const hi: Strings = {
   "kind.ftp": "FTP",
   "add.videoPage": "यह वीडियो पेज है — इसका वीडियो डाउनलोड करें",
   "add.videoPageHint": "YouTube और उन वीडियो साइटों के लिए जिन्हें Peregrine अपने आप नहीं पहचानता।",
+  "add.whenDone": "पूरा होने पर",
+  "add.showPopup": "पॉपअप दिखाएँ",
+  "done.openFile": "फ़ाइल खोलें",
+  "done.openFolder": "फ़ोल्डर खोलें",
+  "done.close": "बंद करें",
+  "settings.donePopup": "डाउनलोड पूरा होने पर पॉपअप विंडो दिखाएँ",
 };

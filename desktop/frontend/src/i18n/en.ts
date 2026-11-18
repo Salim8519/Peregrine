@@ -240,6 +240,12 @@ export const en = {
   "kind.ftp": "FTP",
   "add.videoPage": "This is a video page — download its video",
   "add.videoPageHint": "For YouTube and other video sites that Peregrine does not recognise automatically.",
+  "add.whenDone": "When done",
+  "add.showPopup": "Show popup",
+  "done.openFile": "Open file",
+  "done.openFolder": "Open folder",
+  "done.close": "Close",
+  "settings.donePopup": "Show a popup window when a download finishes",
 } as const;
 
 export type StringKey = keyof typeof en;

@@ -1822,6 +1822,35 @@ tr.selected .cat-icon {
 .more-toggle .flip {
   transform: rotate(180deg);
 }
+/* When done (ADR 0023): three short choices on one line, wrapping when the window is narrow. */
+.when-done {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  font-size: 13px;
+}
+.when-done legend {
+  float: inline-start; /* sit on the same line as the choices */
+  margin-inline-end: 4px;
+  padding: 0;
+  color: var(--muted);
+}
+.when-done .check {
+  gap: 5px;
+}
+.emoji {
+  font-size: 1.05em;
+  line-height: 1;
+}
+.done-dir {
+  margin: 0;
+  font-size: 12px;
+}
 .popup-root {
   height: 100vh;
   overflow: auto;
