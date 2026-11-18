@@ -108,11 +108,16 @@ ShowInstDetails show # This will always show the installation details.
             Abort
             peregrine_close_ok:
         ${EndIf}
-        # /T also ends the yt-dlp and ffmpeg processes the app started.
-        nsExec::Exec `"$SYSDIR\taskkill.exe" /F /T /IM "${PRODUCT_EXECUTABLE}"`
+        # Not taskkill /T: setup opened from Peregrine (a finished download, "Open file") is
+        # a child of the app, so /T killed setup itself and nothing happened (fixed in 0.5.5).
+        nsExec::Exec `"$SYSDIR\taskkill.exe" /F /IM "${PRODUCT_EXECUTABLE}"`
         Pop $0
         Sleep 1000
     ${EndIf}
+    # Helpers the app started (yt-dlp, ffmpeg, deno) keep their exe locked: end every process
+    # that runs from the install folder. Setup itself never runs from there.
+    nsExec::Exec `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Get-CimInstance Win32_Process | Where-Object { $$_.ExecutablePath -and $$_.ExecutablePath.StartsWith('$INSTDIR\', [StringComparison]::OrdinalIgnoreCase) } | ForEach-Object { Stop-Process -Id $$_.ProcessId -Force -ErrorAction SilentlyContinue }"`
+    Pop $0
     # The browser starts the host again the next time the extension needs it.
     nsExec::Exec `"$SYSDIR\taskkill.exe" /F /IM "peregrine-host.exe"`
     Pop $0

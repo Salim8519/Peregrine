@@ -17,6 +17,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 ### Changed
 - The Start now and Add paused buttons show ⬇️ and ⏸️.
 
+### Fixed
+- Windows: setup opened from Peregrine (for example "Open file" on the downloaded
+  installer) closed Peregrine and then quit itself without installing. Setup now closes
+  only Peregrine and its helpers, never itself.
+
 ## [0.5.4] - 2026-11-16
 
 ### Fixed
