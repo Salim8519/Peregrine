@@ -144,6 +144,9 @@ func normalizeSettings(s *Settings) {
 	default:
 		s.Theme = "field"
 	}
+	if !validListSort(s.ListSort) {
+		s.ListSort = DefaultListSort
+	}
 	// Settings that come from the UI are current by definition, even if the client did
 	// not send uiVersion; otherwise a later load would migrate a Classic choice away.
 	s.UIVersion = currentUIVersion

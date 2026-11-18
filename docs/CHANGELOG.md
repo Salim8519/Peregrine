@@ -4,6 +4,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.6] - 2026-11-18
+
+### Changed
+- The download list shows the newest download at the top and the oldest at the bottom.
+- When you sort the list by a column, Peregrine remembers it next time.
+
 ## [0.5.5] - 2026-11-18
 
 ### Added

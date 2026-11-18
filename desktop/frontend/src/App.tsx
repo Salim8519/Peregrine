@@ -31,7 +31,12 @@ import {
   canResume,
   CATEGORIES,
   compareDownloads,
+  DEFAULT_LIST_SORT,
+  formatListSort,
+  ListSort,
   matchesStatus,
+  nextListSort,
+  parseListSort,
   SortKey,
   STATUS_FILTERS,
   StatusFilter,
@@ -218,8 +223,16 @@ export default function App() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [category, setCategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("order");
-  const [sortDir, setSortDir] = useState<1 | -1>(1);
+  // Newest first until the saved choice arrives; the user's choice is saved (ADR 0024).
+  const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
+  const sortLoaded = useRef(false);
+  useEffect(() => {
+    if (settings && !sortLoaded.current) {
+      sortLoaded.current = true;
+      setListSort(parseListSort(settings.listSort));
+    }
+  }, [settings]);
+  const { key: sortKey, dir: sortDir } = listSort;
 
   const all = useMemo(() => Array.from(downloads.values()).sort((a, b) => a.order - b.order), [downloads]);
 
@@ -250,16 +263,9 @@ export default function App() {
   }, [all, statusFilter, category, search, sortKey, sortDir]);
 
   const onSort = (k: SortKey) => {
-    if (k === sortKey) {
-      if (sortDir === 1) setSortDir(-1);
-      else {
-        setSortKey("order");
-        setSortDir(1);
-      }
-    } else {
-      setSortKey(k);
-      setSortDir(1);
-    }
+    const next = nextListSort(listSort, k);
+    setListSort(next);
+    void run(async () => setSettings(await api.updateSettings({ listSort: formatListSort(next) })));
   };
 
   // ---- selection ----

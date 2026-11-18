@@ -84,6 +84,8 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
 
 ## 5. Desktop app (Phase 2)
 - Main list: name, size, progress, speed (live), time left (steady countdown, "Waiting…" when no data arrives; ADR 0019), status, date added (local "YYYY-MM-DD HH:mm"; hover shows added and finished in full; hidden under 960 px wide); filter by category/status; search.
+  Newest download at the top by default; clicking a column header sorts by it (ascending,
+  descending, then queue order) and the choice is remembered (ADR 0024).
 - Add dialog: URL(s), folder, filename, connections, checksum, start now / add to queue.
   An offered link (extension, clipboard, OS) opens the short form: name, size, folder, with
   "More details" for the rest. While the app is in the tray, minimised, or (Windows) open behind

@@ -88,6 +88,7 @@ export interface Settings {
   notify: boolean;
   updateCheck: boolean;
   donePopup: boolean; // last choice of "show a popup when done" in the add dialog
+  listSort?: string; // how the download list is sorted, "<column>-<asc|desc>"; default "date-desc"
 }
 
 export type WhenDone = "none" | "quit" | "sleep" | "shutdown";

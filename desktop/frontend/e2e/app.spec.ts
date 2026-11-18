@@ -156,7 +156,8 @@ test("filter by category and status, and search", async ({ app, info }) => {
   await app.getByTestId("cat-Video").click();
   await expect(rows).toHaveCount(3);
   await expect(app.getByTestId("cat-Video").locator(".count")).toHaveText("3");
-  await expect(rows.getByTestId("row-name")).toHaveText(["clip1.mp4", "clip2.mp4", "clip3.mp4"]);
+  // Newest first by default (ADR 0024).
+  await expect(rows.getByTestId("row-name")).toHaveText(["clip3.mp4", "clip2.mp4", "clip1.mp4"]);
 
   await app.getByTestId("cat-Documents").click();
   await expect(rows).toHaveCount(1);
@@ -187,6 +188,17 @@ test("filter by category and status, and search", async ({ app, info }) => {
   await expect(app.locator("th.c-name")).toHaveAttribute("aria-sort", "descending");
   const names = await rows.getByTestId("row-name").allTextContents();
   expect(names).toEqual([...names].sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" })));
+
+  // The chosen sort is remembered next time (ADR 0024).
+  await expect.poll(async () => (await rpc<{ listSort: string }>(app, "getSettings")).listSort).toBe("name-desc");
+  await app.reload();
+  await expect(app.locator("th.c-name")).toHaveAttribute("aria-sort", "descending");
+  await expect(rows.getByTestId("row-name")).toHaveText(names);
+
+  // A third click goes back to queue order, which the move up/down tests below use.
+  await app.getByRole("button", { name: "Name" }).click();
+  await expect(app.locator("th.c-name")).toHaveAttribute("aria-sort", "none");
+  await expect.poll(async () => (await rpc<{ listSort: string }>(app, "getSettings")).listSort).toBe("order-asc");
 });
 
 test("settings persist after reload", async ({ app }) => {

@@ -16,6 +16,36 @@ export function matchesStatus(d: Download, f: StatusFilter): boolean {
 
 export type SortKey = "order" | "name" | "size" | "progress" | "speed" | "eta" | "status" | "date";
 
+const SORT_KEYS: readonly SortKey[] = ["order", "name", "size", "progress", "speed", "eta", "status", "date"];
+
+export interface ListSort {
+  key: SortKey;
+  dir: 1 | -1;
+}
+
+/** Newest download at the top (ADR 0024). */
+export const DEFAULT_LIST_SORT: ListSort = { key: "date", dir: -1 };
+
+/** Reads Settings.listSort ("<column>-<asc|desc>"); anything else gives the default. */
+export function parseListSort(s: string | undefined): ListSort {
+  const [key, dir, extra] = (s ?? "").split("-");
+  if (extra === undefined && SORT_KEYS.includes(key as SortKey) && (dir === "asc" || dir === "desc")) {
+    return { key: key as SortKey, dir: dir === "asc" ? 1 : -1 };
+  }
+  return DEFAULT_LIST_SORT;
+}
+
+export function formatListSort(s: ListSort): string {
+  return `${s.key}-${s.dir === 1 ? "asc" : "desc"}`;
+}
+
+/** A click on a column header: ascending, then descending, then back to queue order. */
+export function nextListSort(cur: ListSort, k: SortKey): ListSort {
+  if (k !== cur.key) return { key: k, dir: 1 };
+  if (cur.dir === 1) return { key: k, dir: -1 };
+  return { key: "order", dir: 1 };
+}
+
 const statusRank: Record<Status, number> = { downloading: 0, queued: 1, paused: 2, error: 3, completed: 4 };
 
 export function compareDownloads(a: Download, b: Download, key: SortKey): number {

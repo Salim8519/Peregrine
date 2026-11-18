@@ -73,7 +73,9 @@ JSON objects: `{type, download?, downloads?, id?, settings?, schedule?, capture?
 empty = every day), whenDone: "none" | "quit" | "sleep" | "shutdown"}`. Outside the window
 queued downloads wait; at the stop time running downloads go back to the queue with their
 progress. Without a stop time the window lasts 24 hours. Desktop-only settings stored by the
-engine: `closeToTray`, `launchAtLogin`, `notify`, `updateCheck` (daily update check, ADR 0020).
+engine: `closeToTray`, `launchAtLogin`, `notify`, `updateCheck` (daily update check, ADR 0020), `donePopup` (ADR 0023), `listSort`
+(`"<column>-<asc|desc>"`, columns `order name size progress speed eta status date`;
+default and fallback `"date-desc"`, ADR 0024).
 
 Desktop-only (Wails, not RPC): bindings `App.SetFocused(bool)` and `App.CancelPowerAction()`;
 event `peregrine:power` `{action, seconds}` (a when-done countdown started; `action: ""` =

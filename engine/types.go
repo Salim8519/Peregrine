@@ -5,6 +5,7 @@ package engine
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -132,6 +133,9 @@ type Settings struct {
 	UpdateCheck   bool `json:"updateCheck"`   // check GitHub for a newer release (ADR 0020)
 	// DonePopup is the add dialog's last choice for "show a popup when done" (ADR 0023).
 	DonePopup bool `json:"donePopup"`
+	// ListSort is how the download list is sorted, "<column>-<asc|desc>" (ADR 0024).
+	// The default, "date-desc", puts the newest download at the top.
+	ListSort string `json:"listSort"`
 
 	// UIVersion records which one-time settings migrations have run (see migrateSettings).
 	UIVersion int `json:"uiVersion"`
@@ -170,7 +174,24 @@ func DefaultSettings() Settings {
 		Notify:      true,
 		UpdateCheck: true,
 		DonePopup:   true,
+		ListSort:    DefaultListSort,
 	}
+}
+
+// DefaultListSort shows the newest download at the top of the list.
+const DefaultListSort = "date-desc"
+
+// validListSort reports whether s is "<column>-<asc|desc>" for a column the list can sort by.
+func validListSort(s string) bool {
+	col, dir, ok := strings.Cut(s, "-")
+	if !ok || (dir != "asc" && dir != "desc") {
+		return false
+	}
+	switch col {
+	case "order", "name", "size", "progress", "speed", "eta", "status", "date":
+		return true
+	}
+	return false
 }
 
 // Limits.
