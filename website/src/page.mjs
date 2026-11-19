@@ -49,7 +49,7 @@ export function render(t, all, version) {
         "@type": "SoftwareApplication",
         name: "Peregrine",
         applicationCategory: "UtilitiesApplication",
-        operatingSystem: "Windows 10, Windows 11, macOS 12+, Linux (CLI)",
+        operatingSystem: "Windows 10, Windows 11, macOS 13+, Linux (CLI)",
         description: t.meta.description,
         inLanguage: t.lang,
         url: url(t.path),

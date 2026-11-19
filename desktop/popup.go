@@ -241,7 +241,7 @@ func (w wailsWindow) center()                   { wruntime.WindowCenter(w.ctx) }
 func (w wailsWindow) unmaximise()               { wruntime.WindowUnmaximise(w.ctx) }
 func (w wailsWindow) maximise()                 { wruntime.WindowMaximise(w.ctx) }
 func (w wailsWindow) minimise()                 { wruntime.WindowMinimise(w.ctx) }
-func (w wailsWindow) hide()                     { wruntime.WindowHide(w.ctx) }
+func (w wailsWindow) hide()                     { hideToTray(w.ctx) }
 func (w wailsWindow) flyToTray() func()         { return flyToTray() }
 func (w wailsWindow) setOnTop(on bool)          { wruntime.WindowSetAlwaysOnTop(w.ctx, on) }
 func (w wailsWindow) showBehind(maximised bool) { showWindowBehind(maximised) }

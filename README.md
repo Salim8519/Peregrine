@@ -55,7 +55,7 @@ Download from [peregrinedownloader.app](https://peregrinedownloader.app/#downloa
 | Platform | File |
 |---|---|
 | Windows 10/11 (x64) | `Peregrine-<version>-windows-x64-setup.exe` (or the portable `.zip`) |
-| macOS 12+ (Intel & Apple Silicon) | `Peregrine-<version>-macos-universal.dmg` |
+| macOS 13 Ventura+ (Intel & Apple Silicon) | `Peregrine-<version>-macos-universal.dmg` |
 | Browser extension | `Peregrine-<version>-chromium-extension.zip` (store listing coming) |
 | CLI (Windows/macOS/Linux) | `peregrine-cli-<version>-<os>-<arch>` |
 
@@ -63,7 +63,9 @@ Verify downloads with `SHA256SUMS.txt` from the same release.
 
 **First launch on unsigned builds**
 - Windows: SmartScreen → *More info* → *Run anyway*.
-- macOS: right-click `Peregrine.app` → *Open* → *Open* (or System Settings → Privacy & Security → *Open Anyway*).
+- macOS: open `Peregrine.app` once (macOS says it cannot check it; click *Done*), then
+  System Settings → Privacy & Security → *Open Anyway* → *Open*. (Since macOS 15 the old
+  right-click → *Open* trick no longer works.)
 
 **Browser extension (until it is in the stores)**: on first launch Peregrine shows a
 *Connect your browser* guide — it opens your browser's extensions page and the bundled

@@ -4,7 +4,7 @@
 // reached, it falls back to the last release known when this file was written.
 
 const REPO = "Salim8519/Peregrine";
-const FALLBACK_TAG = "v0.5.6";
+const FALLBACK_TAG = "v0.5.7";
 
 // platform -> function(version) => asset file name
 const ASSETS = {

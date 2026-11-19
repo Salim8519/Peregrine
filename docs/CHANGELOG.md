@@ -4,6 +4,31 @@ Format: [Keep a Changelog](https://keepachangelog.com/). Newest first.
 
 ## Unreleased
 
+## [0.5.7] - 2026-11-19
+
+A macOS compatibility release. Windows behaves exactly as in 0.5.6.
+
+### Changed
+- macOS: Peregrine now needs macOS 13 Ventura or later (the Go version it is built with
+  does not run on macOS 12).
+- macOS: the app's identifier is now `com.peregrine.app`, so macOS may ask once more for
+  permission to show notifications or use folders.
+- macOS: the menu-bar icon is a monochrome icon that matches light and dark menu bars.
+- macOS: shortcuts are shown as ⌘N instead of Ctrl+N.
+- First launch on macOS: open the app once, then System Settings → Privacy & Security →
+  *Open Anyway* (right-click → Open no longer works on recent macOS).
+
+### Fixed
+- macOS: a link sent from the browser while Peregrine was hidden (red close button or ⌘H)
+  opened the whole window instead of the small quick-add popup.
+- macOS: clicking the Dock icon did nothing after Peregrine started hidden at login, or
+  after a quick-add popup closed.
+- macOS: "Shut down when done" could not ask System Events to shut down.
+- macOS: when the browser extension starts Peregrine, macOS now treats it as its own app
+  (not part of the browser) for permissions.
+- macOS: Peregrine stops sending progress to a hidden window and frees memory while hidden,
+  as on Windows.
+
 ## [0.5.6] - 2026-11-18
 
 ### Changed
