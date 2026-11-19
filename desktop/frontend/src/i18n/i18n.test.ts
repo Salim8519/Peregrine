@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { en, StringKey } from "./en";
-import { asLang, isRTL, LANGUAGES, translate } from "./index";
+import { asLang, isRTL, LANGUAGES, macShortcuts, translate } from "./index";
+
+describe("macShortcuts", () => {
+  it("writes Ctrl+ shortcuts the macOS way in every language", () => {
+    expect(macShortcuts("Add a download (Ctrl+N)")).toBe("Add a download (⌘N)");
+    expect(macShortcuts("“URL 추가”를 클릭하거나 Ctrl+N을 누르거나")).toBe("“URL 추가”를 클릭하거나 ⌘N을 누르거나");
+    expect(macShortcuts("No shortcut here")).toBe("No shortcut here");
+    for (const lang of LANGUAGES) {
+      const table = lang.table as Record<string, string>;
+      for (const v of Object.values(table)) expect(macShortcuts(v), lang.code).not.toMatch(/Ctrl/);
+    }
+  });
+});
 
 const placeholders = (s: string) => (s.match(/\{[a-z]+\}/gi) ?? []).sort();
 

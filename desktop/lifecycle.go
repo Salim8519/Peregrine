@@ -126,6 +126,7 @@ func (l *life) start(ctx context.Context) {
 	l.setHiddenLocked(launchedHidden())
 	l.mu.Unlock()
 
+	watchMacApp(l.appHiddenChanged, l.app.showWindow) // macOS only
 	l.tray.start(st.Language)
 	go l.trimLoop()
 	go l.updateLoop(ctx)
@@ -161,6 +162,15 @@ func (l *life) start(ctx context.Context) {
 }
 
 func (l *life) setNotifyOK(ok bool) { l.mu.Lock(); l.notifyOK = ok; l.mu.Unlock() }
+
+// appHiddenChanged is called when macOS hides or unhides the app (close button, Cmd+H,
+// Dock click, menu bar). Being hidden is what makes a captured link open the quick-add
+// popup, pauses progress updates to the UI and allows memory trimming.
+func (l *life) appHiddenChanged(hidden bool) {
+	l.mu.Lock()
+	l.setHiddenLocked(hidden)
+	l.mu.Unlock()
+}
 
 // setHiddenLocked records whether the window is hidden; l.mu must be held.
 func (l *life) setHiddenLocked(hidden bool) {

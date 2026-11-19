@@ -30,7 +30,12 @@ func peregrineTrayStart() {
 	}
 }
 
-func setTrayIcon() { systray.SetIcon(trayPNG) }
+// The menu bar gets a black silhouette marked as a template image, which macOS tints to
+// match a light or dark menu bar (the full-colour tile is used on Windows and Linux).
+func setTrayIcon() { systray.SetTemplateIcon(trayTemplatePNG, trayPNG) }
+
+//go:embed build/tray-template.png
+var trayTemplatePNG []byte
 
 //go:embed build/tray.png
 var trayPNG []byte

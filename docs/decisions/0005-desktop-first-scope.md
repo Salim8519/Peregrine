@@ -10,7 +10,8 @@ used mostly on desktop. The maintainer also asked whether browser downloads can 
 without any extension.
 
 ## Decision
-- **Official v1 platforms:** Windows 10+ and macOS 12+.
+- **Official v1 platforms:** Windows 10+ and macOS 12+ (macOS 13+ since 0.5.7, because the
+  Go toolchain requires it; ADR 0025).
 - **Browser capture:** one Manifest V3 extension for Chromium browsers (Chrome, Edge, Brave,
   Opera, Vivaldi), talking to the app over Native Messaging. **Required** for click-to-capture.
 - **Fallback without the extension:** opt-in clipboard monitor (copy a link → add dialog).

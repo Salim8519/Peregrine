@@ -12,7 +12,7 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
 - Max out the user's bandwidth with multi-connection segmented downloads.
 - Never lose a download: survive crashes, reboots, network drops, sleep.
 - Capture downloads and videos from the browser with one click.
-- Run on Windows 10+ and macOS 12+ (Intel and Apple Silicon).
+- Run on Windows 10+ and macOS 13+ (Intel and Apple Silicon; Go 1.27 needs macOS 13, ADR 0025).
 - Secure by default.
 
 **Non-goals (for now)**
@@ -99,7 +99,9 @@ open source (GPL-3.0), no ads, no telemetry, no nagging. Desktop-first: Windows 
   capture method for browsers without our extension (e.g. Safari, Firefox in v1).
 - Tray (Windows, Linux) / menu-bar (macOS) icon with open, pause all, resume all, schedule
   on/off and quit; closing the window keeps the app in the tray (setting; on macOS the close
-  button hides the app as usual). System notifications on finish/error while the window is
+  button hides the app as usual, a hidden app counts as "in the menu bar" for the quick-add
+  popup, and a Dock click shows the window again, ADR 0025). On macOS the menu-bar icon is a
+  template image that follows the light/dark menu bar, and shortcuts are shown with ⌘. System notifications on finish/error while the window is
   not focused (setting); the finish notification has Open file and Show in folder buttons.
 - Start when the user signs in (opt-in), hidden in the tray: HKCU Run key (Windows),
   LaunchAgent (macOS), XDG autostart (Linux).
@@ -116,7 +118,9 @@ The extension is the only secure, reliable way to send clicked browser downloads
 (proxy, folder-watching and code-injection approaches were rejected in ADR 0005).
 - One Manifest V3 codebase for Chrome, Edge, Brave, Opera, Vivaldi.
 - The app installer registers the Native Messaging host for each installed Chromium browser
-  (Windows registry keys; macOS `NativeMessagingHosts` folders).
+  (Windows registry keys; macOS `NativeMessagingHosts` folders). When the app is not running
+  the host starts it: on macOS by opening the `.app` bundle through LaunchServices
+  (`/usr/bin/open`), so the app is not the browser's child (ADR 0025).
 - Intercept browser downloads (`downloads.onCreated`) above a size threshold or by file type,
   cancel the browser's copy and hand off URL + cookies + referer + headers to the app.
 - Detect media (HLS `.m3u8`, DASH `.mpd`, direct video) on the page and show a "Download"

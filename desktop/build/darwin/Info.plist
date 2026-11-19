@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Peregrine's macOS app bundle info (ADR 0025). Wails fills the template fields from
+     wails.json at build time. Keep CFBundleIdentifier stable: macOS ties notification and
+     privacy permissions to it. -->
+<plist version="1.0">
+    <dict>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleName</key>
+        <string>{{.Info.ProductName}}</string>
+        <key>CFBundleDisplayName</key>
+        <string>{{.Info.ProductName}}</string>
+        <key>CFBundleExecutable</key>
+        <string>{{.OutputFilename}}</string>
+        <key>CFBundleIdentifier</key>
+        <string>com.peregrine.app</string>
+        <key>CFBundleVersion</key>
+        <string>{{.Info.ProductVersion}}</string>
+        <key>CFBundleGetInfoString</key>
+        <string>{{.Info.Comments}}</string>
+        <key>CFBundleShortVersionString</key>
+        <string>{{.Info.ProductVersion}}</string>
+        <key>CFBundleIconFile</key>
+        <string>iconfile</string>
+        <key>LSApplicationCategoryType</key>
+        <string>public.app-category.utilities</string>
+        <!-- The Go toolchain this app is built with runs on macOS 13 Ventura and later. -->
+        <key>LSMinimumSystemVersion</key>
+        <string>13.0</string>
+        <key>NSHighResolutionCapable</key>
+        <true/>
+        <key>NSHumanReadableCopyright</key>
+        <string>{{.Info.Copyright}}</string>
+        <!-- Shown when the scheduler's "shut down when done" asks System Events to shut down. -->
+        <key>NSAppleEventsUsageDescription</key>
+        <string>Peregrine asks System Events to shut down the Mac when you choose "Shut down" for when the download queue is done.</string>
+        <!-- Shown when you pick one of these as a download folder. -->
+        <key>NSDownloadsFolderUsageDescription</key>
+        <string>Peregrine saves your downloads in the folder you choose.</string>
+        <key>NSDesktopFolderUsageDescription</key>
+        <string>Peregrine saves your downloads in the folder you choose.</string>
+        <key>NSDocumentsFolderUsageDescription</key>
+        <string>Peregrine saves your downloads in the folder you choose.</string>
+        <key>NSRemovableVolumesUsageDescription</key>
+        <string>Peregrine saves your downloads in the folder you choose.</string>
+        <key>NSNetworkVolumesUsageDescription</key>
+        <string>Peregrine saves your downloads in the folder you choose.</string>
+        {{if .Info.FileAssociations}}
+        <key>CFBundleDocumentTypes</key>
+        <array>
+          {{range .Info.FileAssociations}}
+          <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+              <string>{{.Ext}}</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>{{.Name}}</string>
+            <key>CFBundleTypeRole</key>
+            <string>{{.Role}}</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>{{.IconName}}</string>
+          </dict>
+          {{end}}
+        </array>
+        {{end}}
+        {{if .Info.Protocols}}
+        <key>CFBundleURLTypes</key>
+        <array>
+          {{range .Info.Protocols}}
+            <dict>
+                <key>CFBundleURLName</key>
+                <string>com.peregrine.{{.Scheme}}</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>{{.Scheme}}</string>
+                </array>
+                <key>CFBundleTypeRole</key>
+                <string>{{.Role}}</string>
+            </dict>
+          {{end}}
+        </array>
+        {{end}}
+    </dict>
+</plist>

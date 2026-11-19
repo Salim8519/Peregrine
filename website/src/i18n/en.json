@@ -26,7 +26,7 @@
   "notes": {
     "title": "Field notes",
     "items": [
-      ["Habitat", "Windows 10 and 11, macOS 12 and later. Seen on Linux at the command line.", "Also nests in Chrome, Edge, Brave, Opera and Vivaldi through an extension that hands over downloads with their cookies."],
+      ["Habitat", "Windows 10 and 11, macOS 13 and later. Seen on Linux at the command line.", "Also nests in Chrome, Edge, Brave, Opera and Vivaldi through an extension that hands over downloads with their cookies."],
       ["Diet", "HTTP and HTTPS, FTP, torrents and magnet links, HLS and DASH streams, video sites.", "Does not eat your data. It makes no network requests except the downloads you start."],
       ["Behaviour", "When one connection finishes its part, it stoops on half of the slowest part that is left.", "So no connection ever sits idle while one slow part drags the download out."],
       ["Memory", "Writes its position to a crash-safe database every second.", "Bytes go to a .peregrine.part file and get the real name only after they are verified."]
@@ -108,11 +108,11 @@
     "body": "These links always lead to the newest release. Current version:",
     "rows": [
       ["Windows 10 / 11", "64-bit installer, about 63 MB", "windows", "windows-portable", "portable .zip"],
-      ["macOS 12 and later", "One .dmg for Apple Silicon and Intel", "macos", "", ""],
+      ["macOS 13 and later", "One .dmg for Apple Silicon and Intel", "macos", "", ""],
       ["Linux", "Command-line app, x64", "linux", "linux-arm64", "ARM64"],
       ["Browser extension", "Chromium browsers; the app walks you through it", "extension", "", ""]
     ],
-    "unsigned": "Early preview: builds are not code-signed yet. Windows SmartScreen: <i>More info</i> → <i>Run anyway</i>. macOS: right-click the app → <i>Open</i>. Check any file against <a href=\"/download/checksums\">SHA256SUMS.txt</a>.",
+    "unsigned": "Early preview: builds are not code-signed yet. Windows SmartScreen: <i>More info</i> → <i>Run anyway</i>. macOS: open the app once, then System Settings → Privacy &amp; Security → <i>Open Anyway</i>. Check any file against <a href=\"/download/checksums\">SHA256SUMS.txt</a>.",
     "all": "All files and older versions on GitHub"
   },
   "footer": {

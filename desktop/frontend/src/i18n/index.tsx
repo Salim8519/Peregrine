@@ -47,10 +47,18 @@ export function asLang(code: string | undefined): Lang {
 
 export type TFunc = (key: StringKey, vars?: Record<string, string | number>) => string;
 
+/** True on macOS, where shortcuts use the Command key (the app accepts Ctrl and ⌘ alike). */
+export const IS_MAC = typeof navigator !== "undefined" && /Mac/i.test(navigator.platform || navigator.userAgent || "");
+
+/** Shows "Ctrl+N" as "⌘N", the way macOS writes shortcuts. */
+export function macShortcuts(s: string): string {
+  return s.replace(/\bCtrl\+/g, "⌘");
+}
+
 export function translate(lang: Lang, key: StringKey, vars?: Record<string, string | number>): string {
   let s: string = tables[lang]?.[key] ?? en[key] ?? key;
   if (vars) for (const [k, v] of Object.entries(vars)) s = s.split(`{${k}}`).join(String(v));
-  return s;
+  return IS_MAC ? macShortcuts(s) : s;
 }
 
 export function isRTL(lang: Lang): boolean {

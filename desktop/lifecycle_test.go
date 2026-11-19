@@ -71,3 +71,43 @@ func TestDesktopEventsDoNotFreezeEngine(t *testing.T) {
 	_ = m.Close()
 	_ = store.Close()
 }
+
+// macOS reports hide/unhide of the whole app (close button, Cmd+H, Dock click). Being
+// hidden must reach everything that depends on it: the quick-add popup, the progress
+// gate for the UI and memory trimming.
+func TestAppHiddenChanged(t *testing.T) {
+	a := &App{}
+	a.life = newLife(a)
+	defer a.life.stopEvents()
+	l := a.life
+
+	l.appHiddenChanged(true)
+	l.mu.Lock()
+	hidden, since := l.hidden, l.hiddenSince
+	l.mu.Unlock()
+	if !hidden || !l.uiHidden.Load() || since.IsZero() {
+		t.Fatalf("after hide: hidden=%v uiHidden=%v since=%v", hidden, l.uiHidden.Load(), since)
+	}
+	if forwardToUI(api.Event{Event: engine.Event{Type: engine.EventProgress}}, l.uiHidden.Load()) {
+		t.Error("progress still sent to a hidden UI")
+	}
+	if !shouldTrim(trimState{hidden: true, hiddenSince: since}, since.Add(trimAfter)) {
+		t.Error("a hidden app is never trimmed")
+	}
+
+	l.appHiddenChanged(true) // a repeated hide keeps the first hide time
+	l.mu.Lock()
+	again := l.hiddenSince
+	l.mu.Unlock()
+	if !again.Equal(since) {
+		t.Errorf("hiddenSince moved from %v to %v", since, again)
+	}
+
+	l.appHiddenChanged(false)
+	l.mu.Lock()
+	hidden = l.hidden
+	l.mu.Unlock()
+	if hidden || l.uiHidden.Load() {
+		t.Fatalf("after unhide: hidden=%v uiHidden=%v", hidden, l.uiHidden.Load())
+	}
+}
