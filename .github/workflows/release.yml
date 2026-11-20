@@ -72,7 +72,7 @@ jobs:
             cp LICENSE README.md "build/$name/"
             if [ "$os" = windows ]; then (cd build && zip -qr "../out/$name.zip" "$name"); else tar -C build -czf "out/$name.tar.gz" "$name"; fi
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cli
           path: out/*
@@ -166,7 +166,7 @@ jobs:
           cp desktop/build/bin/deno.exe portable/Peregrine/
           cp -r desktop/build/bin/extension portable/Peregrine/extension
           (cd portable && 7z a -tzip "../out/Peregrine-${V}-windows-x64-portable.zip" Peregrine >/dev/null)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows
           path: out/*
@@ -255,7 +255,7 @@ jobs:
           cp -R desktop/build/bin/Peregrine.app dmg/
           ln -s /Applications dmg/Applications
           hdiutil create -volname "Peregrine" -srcfolder dmg -ov -format UDZO "out/Peregrine-${V}-macos-universal.dmg"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos
           path: out/*
@@ -274,7 +274,7 @@ jobs:
           # Same files without the manifest "key": upload this one to Chrome Web Store / Edge Add-ons.
           bash scripts/stage-extension.sh stage-store --store
           (cd stage-store && zip -qr "../out/Peregrine-${V}-chromium-store-upload.zip" .)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: extension
           path: out/*
