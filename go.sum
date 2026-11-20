@@ -115,8 +115,8 @@ github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21/go.mod h1
 github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFPTqq+I=
 github.com/edsrzf/mmap-go v1.1.0 h1:6EUwBLQ/Mcr1EYLE4Tn1VdW1A4ckqCQWZBw8Hr0kjpQ=
 github.com/edsrzf/mmap-go v1.1.0/go.mod h1:19H/e8pUPLicwkyNgOykDXkJ9F0MHE+Z52B8EIth78Q=
-github.com/fclairamb/ftpserverlib v0.33.1 h1:BkTtxjJ5Hi0wnjEyoJHl81URLo92P+h7PtoIv+iQ4os=
-github.com/fclairamb/ftpserverlib v0.33.1/go.mod h1:kvHAaE6wFlfEzI4RwCViiNJrZb2Dne8wpOMng4ySvV8=
+github.com/fclairamb/ftpserverlib v0.33.2 h1:v5KIqlzk+n5TpYb39w93vtyYpWZmjlpXINtlL7/8m6g=
+github.com/fclairamb/ftpserverlib v0.33.2/go.mod h1:kvHAaE6wFlfEzI4RwCViiNJrZb2Dne8wpOMng4ySvV8=
 github.com/frankban/quicktest v1.14.4/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=

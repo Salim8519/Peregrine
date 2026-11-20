@@ -5,7 +5,7 @@ go 1.27.4
 require (
 	github.com/anacrolix/generics v0.2.0
 	github.com/anacrolix/torrent v1.62.0
-	github.com/fclairamb/ftpserverlib v0.33.1
+	github.com/fclairamb/ftpserverlib v0.33.2
 	github.com/spf13/afero v1.15.0
 	golang.org/x/sys v0.50.0
 	golang.org/x/time v0.16.0
