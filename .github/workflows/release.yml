@@ -301,7 +301,7 @@ jobs:
       - name: Attest build provenance
         # Signed statement that every file was built by this workflow from this commit.
         # Verify with: gh attestation verify <file> -R Salim8519/Peregrine
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: "artifacts/*"
       - name: Release notes
