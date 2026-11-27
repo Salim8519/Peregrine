@@ -9,7 +9,7 @@ require (
 	github.com/spf13/afero v1.15.0
 	golang.org/x/sys v0.50.0
 	golang.org/x/time v0.16.0
-	modernc.org/sqlite v1.62.0
+	modernc.org/sqlite v1.63.0
 )
 
 require (
